@@ -2,11 +2,11 @@ object db {
   import scala.util.Try
 
   final class AtomicMap[K, V] {
-    private val db = new java.util.concurrent.ConcurrentHashMap[K,V]
+    private val chm = new java.util.concurrent.ConcurrentHashMap[K,V]
   
-    def put(k: K, v: V): Option[V] = Option(db.put(k, v))
-    def get(k: K): Option[V] = if (db.containsKey(k)) Some(db.get(k)) else None
-    def remove(k: K): Option[V] = Option(db.remove(k)) 
+    def put(k: K, v: V): Option[V] = Option(chm.put(k, v))
+    def get(k: K): Option[V] = if (chm.containsKey(k)) Some(chm.get(k)) else None
+    def remove(k: K): Option[V] = Option(chm.remove(k)) 
 
     /** Update k atomically and return the computed new value. 
      *  The old value Some(v) is given as argument to f 
@@ -15,17 +15,17 @@ object db {
     def update(k: K)(f: Option[V] => Option[V]): Option[V] = {
       import scala.jdk.FunctionConverters._
       val g: (K, V) => V = (k,v) => f(Option(v)).getOrElse(null.asInstanceOf[V])
-      Option(db.compute(k, g.asJava))
+      Option(chm.compute(k, g.asJava))
     }
   
     def toMap: Map[K, V] = {
       import scala.jdk.CollectionConverters._
-      db.asScala.toMap
+      chm.asScala.toMap
     }
 
-    def size: Int = db.size()
+    def size: Int = chm.size()
 
-    def clear(): Unit = db.clear()
+    def clear(): Unit = chm.clear()
   
     override def toString: String = toMap.toString
   }
