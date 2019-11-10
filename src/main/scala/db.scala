@@ -115,7 +115,7 @@ object db {
   private var rooms = new AtomicMap[RoomKey, Room]
   def roomsToMap = rooms.toMap
 
-  def addRoomIfAbsent(course: String, name: String, supervisor: User): Option[Room] = {
+  def addRoomIfEmpty(course: String, name: String, supervisor: User): Option[Room] = {
     rooms.update(RoomKey(course, name)){ rOpt =>
       if (rOpt.isEmpty) Option(Room(course, name, supervisor)) else rOpt
     }
