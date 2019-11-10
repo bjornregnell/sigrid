@@ -39,28 +39,32 @@ object db {
     val show = s"${name.toLowerCase.capitalize}-$number"
   }
 
-  private var users = new AtomicMap[String, Vector[Int]]
+  private var userNames = new AtomicMap[String, Vector[Int]]
 
-  def usersToMap = users.toMap
+  def userNamesToMap = userNames.toMap
+
+  def users: Set[User] = userNamesToMap.map { 
+    case (n, xs) => n -> xs.map(i => User(n, i))
+  }.values.flatten.toSet
 
   /** Create unique User and remember it */
   def addUser(name: String): User = {
     val s = name.filter(_.isLetter).take(MaxNameLength).toLowerCase
     val validName = if (s.isEmpty) DefaultEmptyName else s
-    val nextNumbersOpt = users.update(validName){ xsOpt => 
+    val nextNumbersOpt = userNames.update(validName){ xsOpt => 
       xsOpt.map(xs => xs :+ (Try(xs.max).getOrElse(0) + 1)) 
     }
     User(validName, nextNumbersOpt.map(_.last).getOrElse(1))
   }
 
   def hasUser(u: User): Boolean = {
-    val ns = users.get(u.name).getOrElse(Vector())
+    val ns = userNames.get(u.name).getOrElse(Vector())
     ns.contains(u.number)   
   }
 
   def removeUser(u: User): Boolean = {
     var existed = false
-    users.update(u.name){ xsOpt => 
+    userNames.update(u.name){ xsOpt => 
       val n = u.number
       existed = xsOpt.map(_.contains(n)).getOrElse(false)
       val removed = xsOpt.map(xs => xs.filterNot(_ == n)) 
@@ -70,8 +74,8 @@ object db {
   }
 
   def removeAllUsers(): Int = {
-    val n = users.size
-    users.clear()
+    val n = userNames.size
+    userNames.clear()
     n
   }
 
@@ -109,7 +113,7 @@ object db {
   }
 
   private var rooms = new AtomicMap[RoomKey, Room]
-  def roomsToMao = rooms.toMap
+  def roomsToMap = rooms.toMap
 
   def addRoomIfAbsent(course: String, name: String, supervisor: User): Option[Room] = {
     rooms.update(RoomKey(course, name)){ rOpt =>
@@ -124,6 +128,6 @@ object db {
     rooms.update(k){ rOpt => rOpt.map(_.wantApproval(u)) }
 
   def goodbye(u: User, k: RoomKey): Option[Room] = 
-    rooms.update(k){ rOpt => rOpt.map(_.wantApproval(u)) }
+    rooms.update(k){ rOpt => rOpt.map(_.goodbye(u)) }
 
 }
