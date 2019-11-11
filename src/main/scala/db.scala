@@ -36,10 +36,18 @@ object db {
   case class User(name: String, number: Int){
     require(name.nonEmpty, "name must be not be empty")
     require(number > 0, "number $numer must not be less than 1")
-    val show = s"${name.toLowerCase.capitalize}-$number"
+    val id = s"${name.toLowerCase}-$number"
+  }
+  object User {
+    def fromString(s: String): Option[User] = Try {
+      val xs = s.split('-')
+      assert(xs.length == 2)
+      val name = xs(0).filter(_.isLetter).take(MaxNameLength).toLowerCase
+      User(name,xs(1).toInt)
+    }.toOption
   }
 
-  private var userNames = new AtomicMap[String, Vector[Int]]
+  /*private*/ var userNames = new AtomicMap[String, Vector[Int]]
 
   def userNamesToMap = userNames.toMap
 
@@ -52,7 +60,8 @@ object db {
     val s = name.filter(_.isLetter).take(MaxNameLength).toLowerCase
     val validName = if (s.isEmpty) DefaultEmptyName else s
     val nextNumbersOpt = userNames.update(validName){ xsOpt => 
-      xsOpt.map(xs => xs :+ (Try(xs.max).getOrElse(0) + 1)) 
+      if (xsOpt.isEmpty) Some(Vector(1)) 
+      else xsOpt.map(xs => xs :+ (Try(xs.max).getOrElse(0) + 1)) 
     }
     User(validName, nextNumbersOpt.map(_.last).getOrElse(1))
   }
@@ -84,7 +93,7 @@ object db {
   case class Room(
     course: String, 
     name: String, 
-    supervisor: User,
+    supervisorOpt: Option[User],
     students: Set[User] = Set(), 
     helpQueue: Vector[User] = Vector(), 
     approvalQueue: Vector[User] = Vector(), 
@@ -115,11 +124,25 @@ object db {
   private var rooms = new AtomicMap[RoomKey, Room]
   def roomsToMap = rooms.toMap
 
-  def addRoomIfEmpty(course: String, name: String, supervisor: User): Option[Room] = {
-    rooms.update(RoomKey(course, name)){ rOpt =>
-      if (rOpt.isEmpty) Option(Room(course, name, supervisor)) else rOpt
+  def addRoomIfEmpty(
+    course: String, 
+    roomName: String, 
+    supervisorOpt: Option[User]
+  ): Option[Room] = {
+    rooms.update(RoomKey(course, roomName)){ rOpt =>
+      if (rOpt.isEmpty) Option(Room(course, roomName, supervisorOpt)) else rOpt
     }
   }
+
+  def addStudentToRoomIfNonEmpty(
+    student: User, 
+    course: String, 
+    roomName: String
+  ): Option[Room] = {
+    rooms.update(RoomKey(course, roomName)){ rOpt =>
+      if (rOpt.nonEmpty) rOpt.map(r => r.copy(students = r.students + student)) else rOpt
+    }
+  } 
 
   def wantHelp(u: User, k: RoomKey): Option[Room] = 
     rooms.update(k){ rOpt => rOpt.map(_.wantHelp(u)) }
