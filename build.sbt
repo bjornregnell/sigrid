@@ -6,5 +6,5 @@ libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.5.23"
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 fork := true
-connectInput := true
+run / connectInput := true
 outputStrategy := Some(StdoutOutput)
