@@ -23,9 +23,10 @@ object ui {
     """
   )
 
-  def studentLoginForm: String = s"""
-    |<form action="/sigrid/login" method="get">
+  def loginForm(msg: String = "", action: String, state: String): String = s"""
+    |<form action="$action" method="get">
     |  <div>
+    |    <p> $msg </p>
     |    <label for="name"><b>Ditt förnamn:</b> </label>
     |    <input name="name" id="name" value="" class="mediuminput">
     |    Exempel: kim
@@ -41,21 +42,26 @@ object ui {
     |    Exempel: hacke
     |    </br>
     |
-    |    <input type="hidden" name="state" value="work">
+    |    <input type="hidden" name="state" value="$state">
     |
     |    <button class="button">Enter</button>
     |  </div>
     |</form>
     |""".stripMargin
 
+
+
   def studentUpdatePage(userid: String, course: String, room: String, state: String): String = {
-    def check(value: String) = if (value == state) """checked="checked" """ else ""
+    def check(value: String) = 
+      if (value == state) """checked="checked" """ else ""
+
+
     html.page(title = s"SIGRID: $userid $state", body = s"""
-      |${html.h1(s"=== $userid är i rum $room ===")}
+      |${html.h1(s"=== STUDENT $userid är i rum $room ===")}
       |<p> SIGRID KÖAR. Sidan uppdaterad: ${new java.util.Date} </p>
       |<form action="update" method="get">
       |  <div>
-      |    <label for="userid">Användare: <b>$userid</b> </label>
+      |    <label for="userid">Student: <b>$userid</b> </label>
       |    <label for="kurskod">Kurs: <b>$course</b> </label>
       |    <label for="rum">Rum:<b>$room</b> </label>
       |    </br>
@@ -77,8 +83,39 @@ object ui {
     )
   }
 
-  def sigridHeader: String = s"""
-      ${html.h1("=== SIGRID  ===")}
+  def supervisorUpdatePage(userid: String, course: String, room: String, state: String): String = {
+    def check(value: String) = 
+      if (value == state) """checked="checked" """ else ""
+  
+    html.page(title = s"BEPPE: $userid $state", body = s"""
+      |${html.h1(s"=== HANDLEDARE $userid är i rum $room ===")}
+      |<p> BEPPE HANDLEDER. Sidan uppdaterad: ${new java.util.Date} </p>
+      |<form action="update" method="get">
+      |  <div>
+      |    <label for="userid">Handledare: <b>$userid</b> </label>
+      |    <label for="kurskod">Kurs: <b>$course</b> </label>
+      |    <label for="rum">Rum:<b>$room</b> </label>
+      |    </br>
+      |
+      |    <input type="hidden" name="userid" value="$userid">
+      |    <input type="hidden" name="course" value="$course">
+      |    <input type="hidden" name="room" value="$room">
+      |
+      |    <input type="radio" name="state" value="super"  ${check("super")}> Jubba! Handledare handleder!<br>
+      |    <input type="radio" name="state" value="gone"  ${check("gone")}> Hejdå! Handledare försvinner!<br>  
+      |    </br>
+      |    <button class="button">Uppdatera</button>
+      |  </div>
+      |</form>
+      |$showData
+      |""".stripMargin
+    )
+  }
+
+
+
+  def sigridHeader(heading: String): String = s"""
+      ${html.h1(s"=== $heading  ===")}
       <p> Sigrid är en hjälpköwebbapp @ ${new java.util.Date} </p>
       <p> Kolla koden: 
       ${html.link(
@@ -91,12 +128,24 @@ object ui {
     Rooms:  ${db.roomsToMap}
   """
 
-  def startPage: String = html.page(title = "SIGRID LOGIN", body =
-    s"""
-      $sigridHeader
-      $studentLoginForm
-      $showData
-    """
+  def studentStartPage(msg: String): String = html.page(
+    title = "SIGRID LOGIN", 
+    body =
+      s"""
+        ${sigridHeader("SIGRID")}
+        ${loginForm(msg, action = "/sigrid/login", state = "work")}
+        $showData
+      """
+  )
+
+  def supervisorStartPage(msg: String): String = html.page(
+    title = "BEPPE LOGIN", 
+    body =
+      s"""
+        ${sigridHeader("BEPPE")}
+        ${loginForm(msg, action = "/beppe/login", state = "super")}
+        $showData
+      """
   )
 
 }

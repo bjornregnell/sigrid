@@ -7,6 +7,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import scala.io.StdIn
 import akka.http.scaladsl.server.StandardRoute
+import db.Room
 
 trait WebServer {
   /** Override this with your routes. See doc for akka-http. */
@@ -65,22 +66,57 @@ trait WebServer {
   }
 
   def log(msg: String): Unit = println(s"\n${new java.util.Date}: $msg")
-
 }
 
 object SigridServer extends WebServer {
   override def routes =
     path("hello") { get {  
-      log(s"request /hello")
+      log(s"request: /hello")
       reply(ui.helloPage) 
     } }  ~
+    path("beppe") { get {
+      log(s"request: /beppe")
+      reply(ui.supervisorStartPage("Hej handledare! Fyll i alla fält:")) 
+    } } ~
+    path("beppe" / "login") { get { 
+      parameters("name", "course", "room", "state") { (n, c, r, s) =>
+        log(s"request: /beppe/login?name=$n&course=$c&room=$r&state=$s")
+        val u = db.addUser(n)
+        log(s"added $u to userNamesToMap=${db.userNamesToMap}")
+        val rOpt = db.addRoomIfEmpty(course = c, roomName = r, supervisorOpt = Some(u))
+        log(s"room optionally added: $rOpt")
+        val rOpt2 = db.addSupervisorToRoomIfNonEmpty(
+          course = c, roomName = r, supervisor = u)
+        log(s"supervisor $u added to room: $rOpt")
+        reply(ui.supervisorUpdatePage(u.id, c, r, s))
+    } } } ~
+    path("beppe" / "update") { get { 
+      parameters("userid", "course", "room", "state") { (u, c, r, s) =>
+        log(s"request: /beppe/room?userid=$u&course=$c&room=$r&state=$s")
+        s match {
+          case "gone" => 
+            log(s"hejdå handledare $u")
+            val uOpt = db.User.fromString(u)
+            val okOpt = uOpt.map(db.removeUser)
+            if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
+            reply(ui.supervisorStartPage(s"Handledare $u har sagt hejdå."))
+          
+          case "super" => 
+            log(s"super $u")
+            reply(ui.supervisorUpdatePage(u, c, r, s)) 
+
+          case _ => 
+            log(s"ERROR: supervisor state unknown: $s")
+            reply(ui.studentUpdatePage(u, c, r, s)) 
+       }
+    } } } ~
     path("sigrid") { get {
         log(s"request: /sigrid")
-        reply(ui.startPage) 
+        reply(ui.studentStartPage("Hej student! Fyll i alla fält:")) 
     } } ~
     path("sigrid" / "login") { get { 
       parameters("name", "course", "room", "state") { (n, c, r, s) =>
-        log(s"login: /sigrid/login?name=$n&course=$c&room=$r&state=$s")
+        log(s"request: /sigrid/login?name=$n&course=$c&room=$r&state=$s")
         val u = db.addUser(n)
         log(s"added $u to userNamesToMap=${db.userNamesToMap}")
         val rOpt = db.addRoomIfEmpty(c, r, None)
@@ -93,31 +129,33 @@ object SigridServer extends WebServer {
         log(s"request: /sigrid/room?userid=$u&course=$c&room=$r&state=$s")
         s match {
           case "exit" => 
-            log(s"hejdå $u")
+            log(s"hejdå student $u")
             val uOpt = db.User.fromString(u)
             val okOpt = uOpt.map(db.removeUser)
             if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
-            reply(ui.startPage)
+            reply(ui.studentStartPage(s"Student $u har sagt hejdå."))
           
           case "help" => 
-            log(s"help $u")
+            val uOpt = db.User.fromString(u)
+            val rOpt = uOpt.flatMap(u => db.wantHelp(u, c, r))
+            log(s"help $u changed room to $rOpt")
             reply(ui.studentUpdatePage(u, c, r, s))
 
           case "ready" => 
-            log(s"ready $u")
+            val uOpt = db.User.fromString(u)
+            val rOpt = uOpt.flatMap(u => db.wantApproval(u, c, r))
+            log(s"ready $u changed room to $rOpt")
             reply(ui.studentUpdatePage(u, c, r, s))
 
           case "work" => 
-            log(s"work $u")
+            val uOpt = db.User.fromString(u)
+            val rOpt = uOpt.flatMap(u => db.working(u, c, r))
+            log(s"work $u changed room to $rOpt")
             reply(ui.studentUpdatePage(u, c, r, s)) 
 
           case _ => 
-            log(s"ERROR: state unknown: $s")
+            log(s"ERROR: student state unknown: $s")
             reply(ui.studentUpdatePage(u, c, r, s)) 
        }
     } } }
-
 }
-
-/*
-*/

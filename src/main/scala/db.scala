@@ -1,35 +1,6 @@
 object db {
   import scala.util.Try
 
-  final class AtomicMap[K, V] {
-    private val chm = new java.util.concurrent.ConcurrentHashMap[K,V]
-  
-    def put(k: K, v: V): Option[V] = Option(chm.put(k, v))
-    def get(k: K): Option[V] = if (chm.containsKey(k)) Some(chm.get(k)) else None
-    def remove(k: K): Option[V] = Option(chm.remove(k)) 
-
-    /** Update k atomically and return the computed new value. 
-     *  The old value Some(v) is given as argument to f 
-     *  If value is absent then the argument to f is None. 
-     *  If f returns None then the key is removed. */ 
-    def update(k: K)(f: Option[V] => Option[V]): Option[V] = {
-      import scala.jdk.FunctionConverters._
-      val g: (K, V) => V = (k,v) => f(Option(v)).getOrElse(null.asInstanceOf[V])
-      Option(chm.compute(k, g.asJava))
-    }
-  
-    def toMap: Map[K, V] = {
-      import scala.jdk.CollectionConverters._
-      chm.asScala.toMap
-    }
-
-    def size: Int = chm.size()
-
-    def clear(): Unit = chm.clear()
-  
-    override def toString: String = toMap.toString
-  }
-  
   val MaxNameLength = 25
   val DefaultEmptyName = "Blanka"
 
@@ -47,7 +18,7 @@ object db {
     }.toOption
   }
 
-  /*private*/ var userNames = new AtomicMap[String, Vector[Int]]
+  /*private*/ var userNames = new mutable.AtomicDictionary[String, Vector[Int]]
 
   def userNamesToMap = userNames.toMap
 
@@ -79,10 +50,12 @@ object db {
       val removed = xsOpt.map(xs => xs.filterNot(_ == n)) 
       if (removed == Option(Vector[Int]())) None else removed
     }
+    rooms.updateAll((key,room) => room.goodbye(u))
     existed
   }
 
   def removeAllUsers(): Int = {
+    users.foreach(u => rooms.updateAll((key,room) => room.goodbye(u)))
     val n = userNames.size
     userNames.clear()
     n
@@ -117,11 +90,12 @@ object db {
     def goodbye(u: User): Room = copy(
       students = students - u,
       helpQueue = helpQueue.filterNot(_ == u),
-      approvalQueue = approvalQueue.filterNot(_ == u)
+      approvalQueue = approvalQueue.filterNot(_ == u),
+      supervisorOpt = supervisorOpt.flatMap(s => if (s == u) None else Some(s))
     )
   }
 
-  private var rooms = new AtomicMap[RoomKey, Room]
+  /* private */ var rooms = new mutable.AtomicDictionary[RoomKey, Room]
   def roomsToMap = rooms.toMap
 
   def addRoomIfEmpty(
@@ -144,13 +118,34 @@ object db {
     }
   } 
 
-  def wantHelp(u: User, k: RoomKey): Option[Room] = 
-    rooms.update(k){ rOpt => rOpt.map(_.wantHelp(u)) }
+  def addSupervisorToRoomIfNonEmpty(
+    supervisor: User, 
+    course: String, 
+    roomName: String
+  ): Option[Room] = {
+    rooms.update(RoomKey(course, roomName)){ rOpt =>
+      if (rOpt.nonEmpty) rOpt.map(r => r.copy(supervisorOpt = Some(supervisor))) else rOpt
+    }
+  } 
 
-  def wantApproval(u: User, k: RoomKey): Option[Room] = 
+  def wantHelp(student: User, course: String, roomName: String): Option[Room] = { 
+    val k = RoomKey(course = course, name = roomName)
+    rooms.update(k){ rOpt => rOpt.map(_.wantHelp(student)) }
+  }
+
+  def wantApproval(u: User, course: String, roomName: String): Option[Room] = {
+    val k = RoomKey(course = course, name = roomName)
     rooms.update(k){ rOpt => rOpt.map(_.wantApproval(u)) }
+  }
 
-  def goodbye(u: User, k: RoomKey): Option[Room] = 
+  def working(u: User, course: String, roomName: String): Option[Room] = {
+    val k = RoomKey(course = course, name = roomName)
+    rooms.update(k){ rOpt => rOpt.map(_.working(u)) }
+  }
+
+  def goodbye(u: User, course: String, roomName: String): Option[Room] = {
+    val k = RoomKey(course = course, name = roomName)
     rooms.update(k){ rOpt => rOpt.map(_.goodbye(u)) }
+  }
 
 }
