@@ -1,23 +1,6 @@
 object db {
   import scala.util.Try
 
-  val MaxNameLength = 25
-  val DefaultEmptyName = "Blanka"
-
-  case class User(name: String, number: Int){
-    require(name.nonEmpty, "name must be not be empty")
-    require(number > 0, "number $numer must not be less than 1")
-    val id = s"${name.toLowerCase}-$number"
-  }
-  object User {
-    def fromString(s: String): Option[User] = Try {
-      val xs = s.split('-')
-      assert(xs.length == 2)
-      val name = xs(0).filter(_.isLetter).take(MaxNameLength).toLowerCase
-      User(name,xs(1).toInt)
-    }.toOption
-  }
-
   /*private*/ var userNames = new mutable.AtomicDictionary[String, Vector[Int]]
 
   def userNamesToMap = userNames.toMap
@@ -28,8 +11,8 @@ object db {
 
   /** Create unique User and remember it */
   def addUser(name: String): User = {
-    val s = name.filter(_.isLetter).take(MaxNameLength).toLowerCase
-    val validName = if (s.isEmpty) DefaultEmptyName else s
+    val s = name.filter(_.isLetter).take(User.MaxNameLength).toLowerCase
+    val validName = if (s.isEmpty) User.DefaultEmptyName else s
     val nextNumbersOpt = userNames.update(validName){ xsOpt => 
       if (xsOpt.isEmpty) Some(Vector(1)) 
       else xsOpt.map(xs => xs :+ (Try(xs.max).getOrElse(0) + 1)) 
@@ -61,39 +44,7 @@ object db {
     n
   }
 
-  case class RoomKey(course: String, name: String)
 
-  case class Room(
-    course: String, 
-    name: String, 
-    supervisorOpt: Option[User],
-    students: Set[User] = Set(), 
-    helpQueue: Vector[User] = Vector(), 
-    approvalQueue: Vector[User] = Vector(), 
-  ){
-    def wantHelp(u: User): Room = copy(
-      helpQueue = helpQueue.filterNot(_ == u) :+ u,
-      approvalQueue = approvalQueue.filterNot(_ == u)
-    )
-
-    def wantApproval(u: User): Room = copy(
-      helpQueue = helpQueue.filterNot(_ == u),
-      approvalQueue = approvalQueue.filterNot(_ == u) :+ u
-    )
-
-    def working(u: User): Room = copy(
-      students = students + u,
-      helpQueue = helpQueue.filterNot(_ == u),
-      approvalQueue = approvalQueue.filterNot(_ == u)
-    )
-
-    def goodbye(u: User): Room = copy(
-      students = students - u,
-      helpQueue = helpQueue.filterNot(_ == u),
-      approvalQueue = approvalQueue.filterNot(_ == u),
-      supervisorOpt = supervisorOpt.flatMap(s => if (s == u) None else Some(s))
-    )
-  }
 
   /* private */ var rooms = new mutable.AtomicDictionary[RoomKey, Room]
   def roomsToMap = rooms.toMap
@@ -118,13 +69,15 @@ object db {
     }
   } 
 
-  def addSupervisorToRoomIfNonEmpty(
+  def addSupervisorIfNonEmptyRoomAndSupervisorMissing(
     supervisor: User, 
     course: String, 
     roomName: String
   ): Option[Room] = {
     rooms.update(RoomKey(course, roomName)){ rOpt =>
-      if (rOpt.nonEmpty) rOpt.map(r => r.copy(supervisorOpt = Some(supervisor))) else rOpt
+      if (rOpt.nonEmpty && rOpt.get.supervisorOpt.isEmpty) 
+        rOpt.map(r => r.copy(supervisorOpt = Some(supervisor))) 
+      else rOpt
     }
   } 
 

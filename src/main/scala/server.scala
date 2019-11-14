@@ -7,7 +7,6 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import scala.io.StdIn
 import akka.http.scaladsl.server.StandardRoute
-import db.Room
 
 trait WebServer {
   /** Override this with your routes. See doc for akka-http. */
@@ -65,7 +64,9 @@ trait WebServer {
     complete(e)
   }
 
-  def log(msg: String): Unit = println(s"\n${new java.util.Date}: $msg")
+//  def log(msg: String): Unit = println(s"\n${new java.util.Date}: $msg")
+  def log(msg: String): Unit = println(s"\nSIGRID @ ${Date.now.show}> $msg")
+
 }
 
 object SigridServer extends WebServer {
@@ -84,11 +85,13 @@ object SigridServer extends WebServer {
         val u = db.addUser(n)
         log(s"added $u to userNamesToMap=${db.userNamesToMap}")
         val rOpt = db.addRoomIfEmpty(course = c, roomName = r, supervisorOpt = Some(u))
-        log(s"room optionally added: $rOpt")
-        val rOpt2 = db.addSupervisorToRoomIfNonEmpty(
-          course = c, roomName = r, supervisor = u)
-        log(s"supervisor $u added to room: $rOpt")
-        reply(ui.supervisorUpdatePage(u.id, c, r, s))
+        log(s"room added: $rOpt")
+        val rOpt2 = db.addSupervisorIfNonEmptyRoomAndSupervisorMissing(u,c,roomName = r)
+        val sup: Option[User] = rOpt2.flatMap(_.supervisorOpt)
+        if (sup == Some(u)) {
+          log(s"supervisor $u added to room: $rOpt")
+          reply(ui.supervisorUpdatePage(u.id, c, r, s))
+        } else reply(ui.supervisorStartPage(s"ERROR: Rummet har redan handledare: $sup"))
     } } } ~
     path("beppe" / "update") { get { 
       parameters("userid", "course", "room", "state") { (u, c, r, s) =>
@@ -96,7 +99,7 @@ object SigridServer extends WebServer {
         s match {
           case "gone" => 
             log(s"hejdå handledare $u")
-            val uOpt = db.User.fromString(u)
+            val uOpt = User.fromString(u)
             val okOpt = uOpt.map(db.removeUser)
             if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
             reply(ui.supervisorStartPage(s"Handledare $u har sagt hejdå."))
@@ -130,25 +133,25 @@ object SigridServer extends WebServer {
         s match {
           case "exit" => 
             log(s"hejdå student $u")
-            val uOpt = db.User.fromString(u)
+            val uOpt = User.fromString(u)
             val okOpt = uOpt.map(db.removeUser)
             if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
             reply(ui.studentStartPage(s"Student $u har sagt hejdå."))
           
           case "help" => 
-            val uOpt = db.User.fromString(u)
+            val uOpt = User.fromString(u)
             val rOpt = uOpt.flatMap(u => db.wantHelp(u, c, r))
             log(s"help $u changed room to $rOpt")
             reply(ui.studentUpdatePage(u, c, r, s))
 
           case "ready" => 
-            val uOpt = db.User.fromString(u)
+            val uOpt = User.fromString(u)
             val rOpt = uOpt.flatMap(u => db.wantApproval(u, c, r))
             log(s"ready $u changed room to $rOpt")
             reply(ui.studentUpdatePage(u, c, r, s))
 
           case "work" => 
-            val uOpt = db.User.fromString(u)
+            val uOpt = User.fromString(u)
             val rOpt = uOpt.flatMap(u => db.working(u, c, r))
             log(s"work $u changed room to $rOpt")
             reply(ui.studentUpdatePage(u, c, r, s)) 
