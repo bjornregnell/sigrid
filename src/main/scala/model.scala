@@ -6,8 +6,7 @@ case class User(name: String, number: Int){
 }
 object User {
   val MaxNameLength = 25
-  val DefaultEmptyName = "anonym"
-  
+ 
   def fromString(s: String): Option[User] = scala.util.Try {
     val xs = s.split('-')
     assert(xs.length == 2)
