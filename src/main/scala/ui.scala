@@ -18,12 +18,12 @@ object ui {
   |
   |    <label for="kurskod"><b>Kurskod:</b> </label>
   |    <input name="course" id="course" value="" class="smallinput">
-  |    Exempel: edaa45
+  |    Exempel: EDAA45
   |    </br>
   |
   |    <label for="rum"><b>Rum:</b> </label>
   |    <input name="room" id="room" value="" class="smallinput">
-  |    Exempel: hacke
+  |    Exempel: Hacke 
   |    </br>
   |
   |    <input type="hidden" name="state" value="$state">
