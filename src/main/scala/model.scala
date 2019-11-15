@@ -2,10 +2,11 @@ case class User(name: String, number: Int){
   require(name.nonEmpty, "name must be not be empty")
   require(number > 0, "number $numer must not be less than 1")
   val id = s"${name.toLowerCase}-$number"
+  override def toString = id
 }
 object User {
   val MaxNameLength = 25
-  val DefaultEmptyName = "Blanka"
+  val DefaultEmptyName = "anonym"
   
   def fromString(s: String): Option[User] = scala.util.Try {
     val xs = s.split('-')
