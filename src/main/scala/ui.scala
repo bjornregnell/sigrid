@@ -23,6 +23,66 @@ object ui {
     """
   )
 
+  def showRawDatabase: String = s"""
+  <p></br>--- raw database toStrings for debuging ---</br> 
+    <b>users:</b> ${db.users} </br>
+    </br>
+    <b>rooms:</b> ${db.roomsToMap} </br>
+  </p>
+  """
+
+  def boldIf(cond: Boolean)(s: String) = if (cond) s"<b>$s</b>" else s
+
+  def showQueueLength(qname: String, n: Int): String = s"""
+    ${boldIf(n > 0)(qname)}: $n
+  """
+
+  def showApprovalQueueSize(n: Int): String = s"""
+  """
+  def showRoomShort(r: Room): String = s"""
+    &nbsp; &nbsp;
+    ${r.name}: ${r.students.size} studenter, 
+    handl ${r.supervisor.map(_.id).getOrElse("<b>SAKNAS</b>")}, 
+    ${showQueueLength("hjälp",r.helpQueue.length)},
+    ${showQueueLength("redov", r.approvalQueue.length)}  
+  """
+  
+  def showRoomLong(roomName: String, course: String): String = {
+    val r = db.roomsToMap(RoomKey(course = course, name = roomName))
+    val n = r.students.size
+    s"""
+    <p>    &nbsp; 
+      <b>${r.name}:</b> $n student${if (n != 1) "er" else ""}, 
+      handledare ${r.supervisor.map(_.id).getOrElse("<b>SAKNAS</b>")} </br>
+
+      &nbsp;&nbsp; <i>hjälpkö:</i> 
+      ${r.helpQueue.length} 
+      ${r.helpQueue.mkString(",")} </br>
+
+      &nbsp;&nbsp; <i>redovkö:</i> 
+      ${r.approvalQueue.length} 
+      ${r.approvalQueue.mkString(",")} </br>
+    </p>
+    """
+  }
+
+
+  def showAllRooms(exceptRoom: Option[String] = None, course: Option[String] = None): String = {
+    val delim = "</br>\n"
+    def roomFilter(r: Room): Boolean = exceptRoom.map(_ != r.name).getOrElse(true) 
+    def courseFilter(r: Room): Boolean = course.map(_ == r.course).getOrElse(true) 
+    val table = db.rooms
+      .filter(r => roomFilter(r) && courseFilter(r))
+      .map(showRoomShort)
+      .mkString(delim)
+    val heading = 
+      if (table.nonEmpty) 
+        s"""&nbsp;${if (exceptRoom.nonEmpty) "Övriga" else "Alla"} rum:</br>"""
+      else ""
+    s"$heading \n $table"
+  }
+
+
   def loginForm(msg: String = "", action: String, state: String): String = s"""
     |<form action="$action" method="get">
     |  <div>
@@ -57,15 +117,9 @@ object ui {
 
 
     html.page(title = s"SIGRID: $userid $state", body = s"""
-      |${html.h1(s"=== STUDENT $userid är i rum $room ===")}
-      |<p> SIGRID KÖAR. Sidan uppdaterad: ${new java.util.Date} </p>
+      |${html.h1(s"=== STUDENT $userid i $room ===")}
       |<form action="update" method="get">
       |  <div>
-      |    <label for="userid">Student: <b>$userid</b> </label>
-      |    <label for="kurskod">Kurs: <b>$course</b> </label>
-      |    <label for="rum">Rum:<b>$room</b> </label>
-      |    </br>
-      |
       |    <input type="hidden" name="userid" value="$userid">
       |    <input type="hidden" name="course" value="$course">
       |    <input type="hidden" name="room" value="$room">
@@ -78,36 +132,41 @@ object ui {
       |    <button class="button">Uppdatera</button>
       |  </div>
       |</form>
-      |$showData
+      |<p> ${course} ${Date.now.show} </p>
+      |${showRoomLong(roomName = room, course = course)}
+      |${showAllRooms(course = Some(course), exceptRoom = Some(room))}
+      |$showRawDatabase
       |""".stripMargin
     )
   }
 
   def supervisorUpdatePage(userid: String, course: String, room: String, state: String): String = {
-    def check(value: String) = 
-      if (value == state) """checked="checked" """ else ""
+    def check(value: String) = if (value == state) """checked="checked" """ else ""
   
     html.page(title = s"BEPPE: $userid $state", body = s"""
-      |${html.h1(s"=== HANDLEDARE $userid är i rum $room ===")}
-      |<p> BEPPE HANDLEDER. Sidan uppdaterad: ${new java.util.Date} </p>
+      |${html.h1(s"=== HANDLEDARE $userid i $room ===")}
       |<form action="update" method="get">
       |  <div>
-      |    <label for="userid">Handledare: <b>$userid</b> </label>
-      |    <label for="kurskod">Kurs: <b>$course</b> </label>
-      |    <label for="rum">Rum:<b>$room</b> </label>
-      |    </br>
       |
-      |    <input type="hidden" name="userid" value="$userid">
-      |    <input type="hidden" name="course" value="$course">
-      |    <input type="hidden" name="room" value="$room">
+      |  <input type="hidden" name="userid" value="$userid">
+      |  <input type="hidden" name="course" value="$course">
+      |  <input type="hidden" name="room" value="$room">
       |
-      |    <input type="radio" name="state" value="super"  ${check("super")}> Jubba! Handledare handleder!<br>
-      |    <input type="radio" name="state" value="gone"  ${check("gone")}> Hejdå! Handledare försvinner!<br>  
-      |    </br>
-      |    <button class="button">Uppdatera</button>
+      |  <input type="radio" name="state" value="supervising" ${check("supervising")}>
+      |        <b>Jubba!</b> Handledare handleder!<br>
+      | 
+      |  <input type="radio" name="state" value="gone"  ${check("gone")}> 
+      |        <b>Hejdå!</b> Handledare försvinner!<br> 
+      |  
+      |   <p>Glöm inte <i>Hejdå! + Uppdatera</i> när undervisningen är klar.</p>
+      |
+      |   <button class="button">Uppdatera</button>
       |  </div>
       |</form>
-      |$showData
+      |<p> ${course} ${Date.now.show} </p>
+      |${showRoomLong(roomName = room, course = course)}
+      |${showAllRooms(course = Some(course), exceptRoom = Some(room))}
+      |$showRawDatabase
       |""".stripMargin
     )
   }
@@ -122,11 +181,7 @@ object ui {
         url="https://github.com/bjornregnell/sigrid/", 
         text="github.com/bjornregnell/sigrid")} </p>
   """
-
-  def showData: String = s"""
-    Users: ${db.users} </br>
-    Rooms:  ${db.roomsToMap}
-  """
+  
 
   def studentStartPage(msg: String): String = html.page(
     title = "SIGRID LOGIN", 
@@ -134,7 +189,7 @@ object ui {
       s"""
         ${sigridHeader("SIGRID")}
         ${loginForm(msg, action = "/sigrid/login", state = "work")}
-        $showData
+        $showRawDatabase
       """
   )
 
@@ -143,8 +198,8 @@ object ui {
     body =
       s"""
         ${sigridHeader("BEPPE")}
-        ${loginForm(msg, action = "/beppe/login", state = "super")}
-        $showData
+        ${loginForm(msg, action = "/beppe/login", state = "supervising")}
+        $showRawDatabase
       """
   )
 

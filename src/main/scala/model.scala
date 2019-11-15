@@ -20,7 +20,7 @@ case class RoomKey(course: String, name: String)
 case class Room(
   course: String, 
   name: String, 
-  supervisorOpt: Option[User],
+  supervisor: Option[User] = None,
   students: Set[User] = Set(), 
   helpQueue: Vector[User] = Vector(), 
   approvalQueue: Vector[User] = Vector(), 
@@ -45,6 +45,9 @@ case class Room(
     students = students - u,
     helpQueue = helpQueue.filterNot(_ == u),
     approvalQueue = approvalQueue.filterNot(_ == u),
-    supervisorOpt = supervisorOpt.flatMap(s => if (s == u) None else Some(s))
+    supervisor = supervisor.flatMap(s => if (s == u) None else Some(s))
   )
+
+  override def toString = 
+    s"Room($course,$name,supervisor=$supervisor,students=$students),helpQueue=$helpQueue,approvalQueue=$approvalQueue"
 }

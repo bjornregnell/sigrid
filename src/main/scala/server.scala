@@ -4,9 +4,9 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.StandardRoute
 import akka.stream.ActorMaterializer
 import scala.io.StdIn
-import akka.http.scaladsl.server.StandardRoute
 
 trait WebServer {
   /** Override this with your routes. See doc for akka-http. */
@@ -59,59 +59,32 @@ trait WebServer {
       .onComplete(_ => system.terminate()) // and shutdown when done
   }
 
-  def reply(body: String): StandardRoute = {
-    val e: HttpEntity.Strict = HttpEntity(ContentTypes.`text/html(UTF-8)`, body)
+  def reply(page: String): StandardRoute = {
+    val e: HttpEntity.Strict = HttpEntity(ContentTypes.`text/html(UTF-8)`, page)
     complete(e)
   }
-
-//  def log(msg: String): Unit = println(s"\n${new java.util.Date}: $msg")
-  def log(msg: String): Unit = println(s"\nSIGRID @ ${Date.now.show}> $msg")
 
 }
 
 object SigridServer extends WebServer {
+  private def low(u: String): String = u.toLowerCase 
+  private def cap(n: String): String = n.toLowerCase.capitalize
+  private def up (c: String): String = c.toUpperCase
+  def log(msg: String): Unit = println(s"\nSIGRID @ ${Date.now.show}> $msg")
+
   override def routes =
-    path("hello") { get {  
-      log(s"request: /hello")
-      reply(ui.helloPage) 
-    } }  ~
+    path("hello") { get { log(s"request: /hello"); reply(ui.helloPage) } }  ~
     path("beppe") { get {
       log(s"request: /beppe")
       reply(ui.supervisorStartPage("Hej handledare! Fyll i alla fält:")) 
     } } ~
     path("beppe" / "login") { get { 
       parameters("name", "course", "room", "state") { (n, c, r, s) =>
-        log(s"request: /beppe/login?name=$n&course=$c&room=$r&state=$s")
-        val u = db.addUser(n)
-        log(s"added $u to userNamesToMap=${db.userNamesToMap}")
-        val rOpt = db.addRoomIfEmpty(course = c, roomName = r, supervisorOpt = Some(u))
-        log(s"room added: $rOpt")
-        val rOpt2 = db.addSupervisorIfNonEmptyRoomAndSupervisorMissing(u,c,roomName = r)
-        val sup: Option[User] = rOpt2.flatMap(_.supervisorOpt)
-        if (sup == Some(u)) {
-          log(s"supervisor $u added to room: $rOpt")
-          reply(ui.supervisorUpdatePage(u.id, c, r, s))
-        } else reply(ui.supervisorStartPage(s"ERROR: Rummet har redan handledare: $sup"))
+        supervisorLogin(low(n), up(c), cap(r), low(s))
     } } } ~
     path("beppe" / "update") { get { 
       parameters("userid", "course", "room", "state") { (u, c, r, s) =>
-        log(s"request: /beppe/room?userid=$u&course=$c&room=$r&state=$s")
-        s match {
-          case "gone" => 
-            log(s"hejdå handledare $u")
-            val uOpt = User.fromString(u)
-            val okOpt = uOpt.map(db.removeUser)
-            if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
-            reply(ui.supervisorStartPage(s"Handledare $u har sagt hejdå."))
-          
-          case "super" => 
-            log(s"super $u")
-            reply(ui.supervisorUpdatePage(u, c, r, s)) 
-
-          case _ => 
-            log(s"ERROR: supervisor state unknown: $s")
-            reply(ui.studentUpdatePage(u, c, r, s)) 
-       }
+        supervisorUpdate(low(u), up(c), cap(r), low(s))
     } } } ~
     path("sigrid") { get {
         log(s"request: /sigrid")
@@ -119,46 +92,96 @@ object SigridServer extends WebServer {
     } } ~
     path("sigrid" / "login") { get { 
       parameters("name", "course", "room", "state") { (n, c, r, s) =>
-        log(s"request: /sigrid/login?name=$n&course=$c&room=$r&state=$s")
-        val u = db.addUser(n)
-        log(s"added $u to userNamesToMap=${db.userNamesToMap}")
-        val rOpt = db.addRoomIfEmpty(c, r, None)
-        log(s"room optionally added: $rOpt")
-        val rOpt2 = db.addStudentToRoomIfNonEmpty(u, c, r)
-        reply(ui.studentUpdatePage(u.id, c, r, s))
+        studentLogin(low(n), up(c), cap(r), low(s))
     } } } ~
     path("sigrid" / "update") { get { 
       parameters("userid", "course", "room", "state") { (u, c, r, s) =>
-        log(s"request: /sigrid/room?userid=$u&course=$c&room=$r&state=$s")
-        s match {
-          case "exit" => 
-            log(s"hejdå student $u")
-            val uOpt = User.fromString(u)
-            val okOpt = uOpt.map(db.removeUser)
-            if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
-            reply(ui.studentStartPage(s"Student $u har sagt hejdå."))
-          
-          case "help" => 
-            val uOpt = User.fromString(u)
-            val rOpt = uOpt.flatMap(u => db.wantHelp(u, c, r))
-            log(s"help $u changed room to $rOpt")
-            reply(ui.studentUpdatePage(u, c, r, s))
-
-          case "ready" => 
-            val uOpt = User.fromString(u)
-            val rOpt = uOpt.flatMap(u => db.wantApproval(u, c, r))
-            log(s"ready $u changed room to $rOpt")
-            reply(ui.studentUpdatePage(u, c, r, s))
-
-          case "work" => 
-            val uOpt = User.fromString(u)
-            val rOpt = uOpt.flatMap(u => db.working(u, c, r))
-            log(s"work $u changed room to $rOpt")
-            reply(ui.studentUpdatePage(u, c, r, s)) 
-
-          case _ => 
-            log(s"ERROR: student state unknown: $s")
-            reply(ui.studentUpdatePage(u, c, r, s)) 
-       }
+        studentUpdate(low(u), up(c), cap(r), low(s))
     } } }
+
+  def supervisorLogin(name: String, course: String, room: String, state: String): StandardRoute = {
+    log(s"request: /beppe/login?name=$name&course=$course&room=$room&state=$state")
+    
+    val u = db.addUser(name)
+    log(s"added $u to userNamesToMap=${db.userNamesToMap}")
+    
+    val rOpt = db.addRoomIfEmpty(course = course, roomName = room, supervisor = Some(u))
+    log(s"room added: $rOpt")
+    
+    val rOpt2 = 
+      db.addSupervisorIfNonEmptyRoomAndSupervisorMissing(u,course,roomName = room)
+    val sup: Option[User] = rOpt2.flatMap(_.supervisor)
+    if (sup == Some(u)) {
+      log(s"supervisor $u added to room: $rOpt")
+      reply(ui.supervisorUpdatePage(u.id, course, room, state))
+    } else reply(ui.supervisorStartPage(s"ERROR: Rummet har redan handledare: $sup"))
+  }
+
+  def studentLogin(name: String, course: String, room: String, state: String): StandardRoute = {
+    log(s"request: /sigrid/login?name=$name&course=$course&room=$room&state=$state")
+    
+    val u = db.addUser(name)
+    log(s"added $u to userNamesToMap=${db.userNamesToMap}")
+    
+    val rOpt = db.addRoomIfEmpty(course, room, None)
+    log(s"room optionally added: $rOpt")
+    
+    val rOpt2 = db.addStudentToRoomIfNonEmpty(u, course, room)
+    reply(ui.studentUpdatePage(u.id, course, room, state))
+  }
+
+  def supervisorUpdate(u: String, c: String, r: String, s: String): StandardRoute = {
+    log(s"request: /beppe/room?userid=$u&course=$c&room=$r&state=$s")
+    s match {
+      case "gone" => 
+        log(s"hejdå handledare $u")
+        val uOpt = User.fromString(u)
+        val okOpt = uOpt.map(db.removeUser)
+        if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
+        reply(ui.supervisorStartPage(s"Handledare $u har sagt hejdå."))
+      
+      case "supervising" => 
+        log(s"supervising $u")
+        reply(ui.supervisorUpdatePage(u, c, r, s)) 
+
+      case _ => 
+        log(s"ERROR: supervisor state unknown: $s")
+        reply(ui.studentUpdatePage(u, c, r, s)) 
+   }
+  }
+
+  def studentUpdate(u: String, c: String, r: String, s: String): StandardRoute = {
+    log(s"request: /sigrid/room?userid=$u&course=$c&room=$r&state=$s")
+    s match {
+      case "exit" => 
+        log(s"hejdå student $u")
+        val uOpt = User.fromString(u)
+        val okOpt = uOpt.map(db.removeUser)
+        if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
+        reply(ui.studentStartPage(s"Student $u har sagt hejdå."))
+      
+      case "help" => 
+        val uOpt = User.fromString(u)
+        val rOpt = uOpt.flatMap(u => db.wantHelp(u, c, r))
+        log(s"help $u changed room to $rOpt")
+        reply(ui.studentUpdatePage(u, c, r, s))
+
+      case "ready" => 
+        val uOpt = User.fromString(u)
+        val rOpt = uOpt.flatMap(u => db.wantApproval(u, c, r))
+        log(s"ready $u changed room to $rOpt")
+        reply(ui.studentUpdatePage(u, c, r, s))
+
+      case "work" => 
+        val uOpt = User.fromString(u)
+        val rOpt = uOpt.flatMap(u => db.working(u, c, r))
+        log(s"work $u changed room to $rOpt")
+        reply(ui.studentUpdatePage(u, c, r, s)) 
+
+      case _ => 
+        log(s"ERROR: student state unknown: $s")
+        reply(ui.studentUpdatePage(u, c, r, s)) 
+    }
+  }
+
 }
