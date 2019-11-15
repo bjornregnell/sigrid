@@ -183,24 +183,26 @@ object ui {
   """
   
 
-  def studentStartPage(msg: String): String = html.page(
-    title = "SIGRID LOGIN", 
-    body =
-      s"""
-        ${sigridHeader("SIGRID")}
-        ${loginForm(msg, action = "/sigrid/login", state = "work")}
-        $showRawDatabase
-      """
-  )
+  def studentStartPage(msg: String = "Hej student! Fyll i alla fält:"): String = 
+    html.page(
+      title = "SIGRID LOGIN", 
+      body =
+        s"""
+          ${sigridHeader("SIGRID")}
+          ${loginForm(msg, action = "/sigrid/login", state = "work")}
+          $showRawDatabase
+        """
+    )
 
-  def supervisorStartPage(msg: String): String = html.page(
-    title = "BEPPE LOGIN", 
-    body =
-      s"""
-        ${sigridHeader("BEPPE")}
-        ${loginForm(msg, action = "/beppe/login", state = "supervising")}
-        $showRawDatabase
-      """
-  )
+  def supervisorStartPage(msg: String = "Hej handledare! Fyll i alla fält:"): String = 
+    html.page(
+      title = "BEPPE LOGIN", 
+      body =
+        s"""
+          ${sigridHeader("BEPPE")}
+          ${loginForm(msg, action = "/beppe/login", state = "supervising")}
+          $showRawDatabase
+        """
+    )
 
 }
