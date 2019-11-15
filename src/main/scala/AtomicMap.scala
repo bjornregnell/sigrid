@@ -1,7 +1,10 @@
 package mutable
 
 /** A thread-safe key-value store with atomic update in-place. */
-final class AtomicDictionary[K, V] {
+final class AtomicMap[K, V] {
+  import scala.jdk.CollectionConverters._
+  import scala.jdk.FunctionConverters._
+
   private val chm = new java.util.concurrent.ConcurrentHashMap[K,V]
 
   def put(k: K, v: V): Option[V] = Option(chm.put(k, v))
@@ -22,15 +25,13 @@ final class AtomicDictionary[K, V] {
   }
 
   /** Update all k -> v atomically to k -> f(k, v). */
-  def updateAll(f: (K, V) => V): Unit = {
-    import scala.jdk.FunctionConverters._
-    chm.replaceAll(f.asJava)
-  }
+  def updateAll(f: (K, V) => V): Unit = chm.replaceAll(f.asJava)
 
-  def toMap: Map[K, V] = {
-    import scala.jdk.CollectionConverters._
-    chm.asScala.toMap
-  }
+  def toMap: Map[K, V] = chm.asScala.toMap
+
+  def keys: Iterable[K] = chm.asScala.keys
+
+  def values: Iterable[V] = chm.asScala.values
 
   def size: Int = chm.size
 
