@@ -1,44 +1,73 @@
 object ui {
-  def sigrid: String = "Sigrid"
-
-  def sigridLink: String = "https://www.youtube.com/watch?v=cc-TAuKWdTI"
-
-  def sigridEmbeddedLink: String = """
-    |<iframe width="560" height="315" 
-    |  src="https://www.youtube.com/embed/cc-TAuKWdTI" 
-    |  frameborder="0" 
-    |  allow=
-    |    "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
-    |  allowfullscreen>
-    |</iframe>
-    |""".trim.stripMargin
-
-  def helloPage: String = html.helloPage(
-    s"""
-    
-    $sigrid är ${html.link(sigridLink, "fäärdiig!!!")} </br>
-
-    $sigridEmbeddedLink
-
-    """
-  )
-
   def showRawDatabase: String = s"""
-  <p></br>--- raw database toStrings for debuging ---</br> 
-    <b>users:</b> ${db.users} </br>
-    </br>
-    <b>rooms:</b> ${db.roomsToMap} </br>
-  </p>
+    <p></br>--- raw database toStrings for debuging ---</br> 
+      <b>users:</b> ${db.users} </br>
+      </br>
+      <b>rooms:</b> ${db.roomsToMap} </br>
+    </p>
+    """
+
+  def loginForm(msg: String = "", action: String, state: String): String = s"""
+  |<form action="$action" method="get">
+  |  <div>
+  |    <p> $msg </p>
+  |    <label for="name"><b>Ditt förnamn:</b> </label>
+  |    <input name="name" id="name" value="" class="mediuminput">
+  |    Exempel: kim
+  |    </br>
+  |
+  |    <label for="kurskod"><b>Kurskod:</b> </label>
+  |    <input name="course" id="course" value="" class="smallinput">
+  |    Exempel: edaa45
+  |    </br>
+  |
+  |    <label for="rum"><b>Rum:</b> </label>
+  |    <input name="room" id="room" value="" class="smallinput">
+  |    Exempel: hacke
+  |    </br>
+  |
+  |    <input type="hidden" name="state" value="$state">
+  |
+  |    <button class="button">Enter</button>
+  |  </div>
+  |</form>
+  |""".stripMargin
+
+  def sigridHeader(heading: String): String = s"""
+    ${html.h1(s"=== $heading  ===")}
+    <p> ${html.link("/hello", "Sigrid")} är en hjälpköwebbapp @ ${new java.util.Date} </p>
+    <p> Kolla koden: 
+    ${html.link(
+      url="https://github.com/bjornregnell/sigrid/", 
+      text="github.com/bjornregnell/sigrid")} </p>
   """
 
-  def boldIf(cond: Boolean)(s: String) = if (cond) s"<b>$s</b>" else s
+  def studentStartPage(msg: String = "Hej student! Fyll i alla fält:"): String = 
+    html.page(
+      title = "SIGRID LOGIN", 
+      body =
+        s"""
+          ${sigridHeader("SIGRID")}
+          ${loginForm(msg, action = "/sigrid/login", state = "work")}
+          $showRawDatabase
+        """
+    )
+
+  def supervisorStartPage(msg: String = "Hej handledare! Fyll i alla fält:"): String = 
+    html.page(
+      title = "BEPPE LOGIN", 
+      body =
+        s"""
+          ${sigridHeader("BEPPE")}
+          ${loginForm(msg, action = "/beppe/login", state = "supervising")}
+          $showRawDatabase
+        """
+    )
 
   def showQueueLength(qname: String, n: Int): String = s"""
-    ${boldIf(n > 0)(qname)}: $n
+    ${html.boldIf(n > 0)(qname)}: $n
   """
-
-  def showApprovalQueueSize(n: Int): String = s"""
-  """
+  
   def showRoomShort(r: Room): String = s"""
     &nbsp; &nbsp;
     ${r.name}: ${r.students.size} studenter, 
@@ -66,7 +95,6 @@ object ui {
     """
   }
 
-
   def showAllRooms(exceptRoom: Option[String] = None, course: Option[String] = None): String = {
     val delim = "</br>\n"
     def roomFilter(r: Room): Boolean = exceptRoom.map(_ != r.name).getOrElse(true) 
@@ -82,39 +110,9 @@ object ui {
     s"$heading \n $table"
   }
 
-
-  def loginForm(msg: String = "", action: String, state: String): String = s"""
-    |<form action="$action" method="get">
-    |  <div>
-    |    <p> $msg </p>
-    |    <label for="name"><b>Ditt förnamn:</b> </label>
-    |    <input name="name" id="name" value="" class="mediuminput">
-    |    Exempel: kim
-    |    </br>
-    |
-    |    <label for="kurskod"><b>Kurskod:</b> </label>
-    |    <input name="course" id="course" value="" class="smallinput">
-    |    Exempel: edaa45
-    |    </br>
-    |
-    |    <label for="rum"><b>Rum:</b> </label>
-    |    <input name="room" id="room" value="" class="smallinput">
-    |    Exempel: hacke
-    |    </br>
-    |
-    |    <input type="hidden" name="state" value="$state">
-    |
-    |    <button class="button">Enter</button>
-    |  </div>
-    |</form>
-    |""".stripMargin
-
-
-
   def studentUpdatePage(userid: String, course: String, room: String, state: String): String = {
     def check(value: String) = 
       if (value == state) """checked="checked" """ else ""
-
 
     html.page(title = s"SIGRID: $userid $state", body = s"""
       |${html.h1(s"=== STUDENT $userid i $room ===")}
@@ -171,38 +169,26 @@ object ui {
     )
   }
 
+  def sigridVideoLink: String = "https://www.youtube.com/watch?v=cc-TAuKWdTI"
 
+  def sigridVideoEmbeddedLink: String = """
+    |<iframe width="560" height="315" 
+    |  src="https://www.youtube.com/embed/cc-TAuKWdTI" 
+    |  frameborder="0" 
+    |  allow=
+    |    "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+    |  allowfullscreen>
+    |</iframe>
+    |""".trim.stripMargin
 
-  def sigridHeader(heading: String): String = s"""
-      ${html.h1(s"=== $heading  ===")}
-      <p> Sigrid är en hjälpköwebbapp @ ${new java.util.Date} </p>
-      <p> Kolla koden: 
-      ${html.link(
-        url="https://github.com/bjornregnell/sigrid/", 
-        text="github.com/bjornregnell/sigrid")} </p>
-  """
-  
+  def helloPage: String = html.helloPage(
+    s"""
+    
+    Sigrid är ${html.link(sigridVideoLink, "fäärdiig!!!")} </br>
 
-  def studentStartPage(msg: String = "Hej student! Fyll i alla fält:"): String = 
-    html.page(
-      title = "SIGRID LOGIN", 
-      body =
-        s"""
-          ${sigridHeader("SIGRID")}
-          ${loginForm(msg, action = "/sigrid/login", state = "work")}
-          $showRawDatabase
-        """
-    )
+    $sigridVideoEmbeddedLink
 
-  def supervisorStartPage(msg: String = "Hej handledare! Fyll i alla fält:"): String = 
-    html.page(
-      title = "BEPPE LOGIN", 
-      body =
-        s"""
-          ${sigridHeader("BEPPE")}
-          ${loginForm(msg, action = "/beppe/login", state = "supervising")}
-          $showRawDatabase
-        """
-    )
+    """
+  )
 
 }

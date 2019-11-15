@@ -62,4 +62,6 @@ object html {
     |</html>""".stripMargin
 
   def link(url: String, text: String = "here"): String = s"""<a href="$url">$text</a>"""
+
+  def boldIf(cond: Boolean)(s: String) = if (cond) s"<b>$s</b>" else s
 }

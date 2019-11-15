@@ -10,7 +10,7 @@ object SigridServer extends WebServer with SigridActions {
     path("hello") { get { log(s"request: /hello"); reply(ui.helloPage) } }  ~
     path("beppe") { get {
       log(s"request: /beppe")
-      reply(ui.supervisorStartPage("Hej handledare! Fyll i alla fält:")) 
+      reply(ui.supervisorStartPage()) 
     } } ~
     path("beppe" / "login") { get { 
       parameters("name", "course", "room", "state") { (n, c, r, s) =>
@@ -22,7 +22,7 @@ object SigridServer extends WebServer with SigridActions {
     } } } ~
     path("sigrid") { get {
         log(s"request: /sigrid")
-        reply(ui.studentStartPage("Hej student! Fyll i alla fält:")) 
+        reply(ui.studentStartPage()) 
     } } ~
     path("sigrid" / "login") { get { 
       parameters("name", "course", "room", "state") { (n, c, r, s) =>
