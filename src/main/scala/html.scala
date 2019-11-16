@@ -2,20 +2,22 @@ object html {
     val styles = """
     |body {
     |    background-color: pink;
-    |    font-size: 25px;
+    |    font-size: 20px;
+    |    line-height: 1.2;
     |    font-family: "Lucida Console", Monaco, monospace;
-    |    margin: 25px 25px;
+    |    margin: 20px 20px;
     |}
     |.button {
     |    background-color: #4CAF50;
     |    border: none;
     |    color: pink;
-    |    padding: 30px 100px;
+    |    padding: 20px 80px;
     |    text-align: center;
     |    text-decoration: none;
     |    display: inline-block;
-    |    font-size: 200%;
-    |    margin: 30px 0px;
+    |    font-size: 150%;
+    |    font-weight:bold;
+    |    margin: 20px 0px;
     |    cursor: pointer;
     |    font-family: "Lucida Console", Monaco, monospace;
     |}
@@ -29,6 +31,7 @@ object html {
     |    font-size: 150%;
     |    margin: 2px 2px;
     |}
+    |input[type='radio'] { transform: scale(1.5); }
     """.stripMargin
 
   def page(body: String, title: String): String = s"""<!DOCTYPE html>
