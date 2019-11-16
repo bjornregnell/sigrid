@@ -2,7 +2,7 @@ import akka.http.scaladsl.server.StandardRoute
 
 trait SigridActions {
   self: WebServer =>
-  
+
   def log(msg: String): Unit = println(s"\nSIGRID @ ${Date.now.show}> $msg")
 
   def supervisorLogin(name: String, course: String, room: String, state: String): StandardRoute = {
@@ -41,7 +41,7 @@ trait SigridActions {
     s match {
       case "gone" => 
         log(s"hejdå handledare $u")
-        val uOpt = User.fromString(u)
+        val uOpt = User.fromUserId(u)
         val okOpt = uOpt.map(db.removeUser)
         if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
         reply(ui.supervisorStartPage(s"Handledare $u har sagt hejdå."))
@@ -61,25 +61,25 @@ trait SigridActions {
     s match {
       case "exit" => 
         log(s"hejdå student $u")
-        val uOpt = User.fromString(u)
+        val uOpt = User.fromUserId(u)
         val okOpt = uOpt.map(db.removeUser)
         if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
         reply(ui.studentStartPage(s"Student $u har sagt hejdå."))
       
       case "help" => 
-        val uOpt = User.fromString(u)
+        val uOpt = User.fromUserId(u)
         val rOpt = uOpt.flatMap(u => db.wantHelp(u, c, r))
         log(s"help $u changed room to $rOpt")
         reply(ui.studentUpdatePage(u, c, r, s))
 
       case "ready" => 
-        val uOpt = User.fromString(u)
+        val uOpt = User.fromUserId(u)
         val rOpt = uOpt.flatMap(u => db.wantApproval(u, c, r))
         log(s"ready $u changed room to $rOpt")
         reply(ui.studentUpdatePage(u, c, r, s))
 
       case "work" => 
-        val uOpt = User.fromString(u)
+        val uOpt = User.fromUserId(u)
         val rOpt = uOpt.flatMap(u => db.working(u, c, r))
         log(s"work $u changed room to $rOpt")
         reply(ui.studentUpdatePage(u, c, r, s)) 

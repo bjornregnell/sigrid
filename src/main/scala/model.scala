@@ -1,21 +1,43 @@
 case class User(name: String, number: Int){
-  require(name.nonEmpty, "name must be not be empty")
-  require(number > 0, "number $numer must not be less than 1")
-  val id = s"${name.toLowerCase}-$number"
+  require(name == User.validName(name), s"invalid user name: $name")
+  require(number > 0, s"invalid user number: $number")
+  val id = s"$name-$number"
   override def toString = id
 }
+
 object User {
-  val MaxNameLength = 25
+  val DefaultUserName = "oddput"
+  val   MaxNameLength = 25
  
-  def fromString(s: String): Option[User] = scala.util.Try {
-    val xs = s.split('-')
+  def fromUserId(uid: String): Option[User] = scala.util.Try {
+    val xs = uid.split('-')
     assert(xs.length == 2)
-    val name = xs(0).filter(_.isLetter).take(MaxNameLength).toLowerCase
-    User(name,xs(1).toInt)
+    User(validName(xs(0)),xs(1).toInt)
   }.toOption
+
+  def validName(s: String): String = 
+    if (s.nonEmpty) s.filter(_.isLetter).take(MaxNameLength).toLowerCase 
+    else DefaultUserName
 }
 
-case class RoomKey(course: String, name: String)
+case class RoomKey private (course: String, roomName: String)
+object RoomKey {
+  val MaxCourseLength = 25
+  val   MaxRoomLength = 20
+  val   DefaultCourse = "KURS01"
+  val     DefaultRoom = "Shäraton"
+
+  def validCourse(s: String): String = 
+    if (s.nonEmpty) s.filter(c => c.isLetter || c.isDigit).take(MaxCourseLength).toUpperCase 
+    else DefaultCourse
+  
+  def validRoomName(s: String): String = 
+    if (s.nonEmpty) s.filter(c => c.isLetter).take(MaxRoomLength).toLowerCase.capitalize 
+    else DefaultRoom
+  
+  def apply(course: String, roomName: String): RoomKey = 
+    new RoomKey(validCourse(course), validRoomName(roomName))
+}
 
 case class Room(
   course: String, 

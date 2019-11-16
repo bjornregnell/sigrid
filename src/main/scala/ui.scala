@@ -77,7 +77,7 @@ object ui {
   """
   
   def showRoomLong(roomName: String, course: String): String = {
-    val r = db.roomsToMap(RoomKey(course = course, name = roomName))
+    val r = db.roomsToMap(RoomKey(course, roomName))
     val n = r.students.size
     s"""
     <p>    &nbsp; 
