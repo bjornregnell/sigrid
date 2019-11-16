@@ -74,5 +74,5 @@ case class Room(
   )
 
   override def toString = 
-    s"Room($course,$name,supervisor=$supervisor,students=$students),helpQueue=$helpQueue,approvalQueue=$approvalQueue"
+    s"Room($course, $name, supervisor=$supervisor, students=$students), helpQueue=$helpQueue,approvalQueue=$approvalQueue)"
 }
