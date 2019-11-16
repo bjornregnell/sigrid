@@ -34,7 +34,7 @@ object ui {
   |""".stripMargin
 
   def sigridHeader(heading: String): String = s"""
-    ${html.h1(s"=== $heading  ===")}
+    ${html.h1(s"* $heading *")}
     <p> ${html.link("/hello", "Sigrid")} är en hjälpköwebbapp @ ${new java.util.Date} </p>
     <p> Kolla koden: 
     ${html.link(
@@ -115,7 +115,7 @@ object ui {
       if (value == state) """checked="checked" """ else ""
 
     html.page(title = s"SIGRID: $userid $state", body = s"""
-      |${html.h1(s"=== STUDENT $userid i $room ===")}
+      |${html.h1(s"STUDENT $userid i $room")}
       |<form action="update" method="get">
       |  <div>
       |    <input type="hidden" name="userid" value="$userid">
@@ -145,7 +145,7 @@ object ui {
     def check(value: String) = if (value == state) """checked="checked" """ else ""
   
     html.page(title = s"BEPPE: $userid $state", body = s"""
-      |${html.h1(s"=== HANDLEDARE $userid i $room ===")}
+      |${html.h1(s"HANDLEDARE $userid i $room")}
       |<form action="update" method="get">
       |  <div>
       |
