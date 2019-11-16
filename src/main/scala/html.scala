@@ -2,7 +2,7 @@ object html {
     val styles = """
     |body {
     |    background-color: pink;
-    |    font-size: medium;
+    |    font-size: x-large;
     |    font-family: "Lucida Console", Monaco, monospace;
     |}
     |.button {
@@ -13,20 +13,20 @@ object html {
     |    text-align: center;
     |    text-decoration: none;
     |    display: inline-block;
-    |    font-size: large;
+    |    font-size: xx-large;
     |    margin: 8px 8px;
     |    cursor: pointer;
     |    font-family: "Lucida Console", Monaco, monospace;
     |}
     |.smallinput {
     |    width: 12%;
-    |    font-size: medium;
+    |    font-size: x-large;
     |    margin: 2px 2px;
     |}
     |.mediuminput {
     |    width: 20%;
-    |    font-size: medium;
-    |    margin: 1px 1px;
+    |    font-size: x-large;
+    |    margin: 2px 2px;
     |}
     """.stripMargin
 
