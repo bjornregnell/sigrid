@@ -51,6 +51,7 @@ case class Room(
   students: Set[User] = Set(), 
   helpQueue: Vector[User] = Vector(), 
   approvalQueue: Vector[User] = Vector(), 
+  created: Date = Date.now,
 ){
   def wantHelp(u: User): Room = copy(
     helpQueue = helpQueue.filterNot(_ == u) :+ u,
@@ -76,5 +77,5 @@ case class Room(
   )
 
   override def toString = 
-    s"Room($course, $name, supervisor=$supervisor, students=$students), helpQueue=$helpQueue, approvalQueue=$approvalQueue)"
+    s"Room($course, $name, supervisor=$supervisor, students=$students), helpQueue=$helpQueue, approvalQueue=$approvalQueue, created=${created})"
 }
