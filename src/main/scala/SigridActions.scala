@@ -20,7 +20,11 @@ trait SigridActions {
     if (sup == Some(u)) {
       log(s"supervisor $u added to room: $rOpt")
       reply(ui.supervisorUpdatePage(u.id, course, room, state))
-    } else reply(ui.supervisorStartPage(s"ERROR: Rummet har redan handledare: $sup"))
+    } else {
+      log(s"ERROR: room $rOpt already has supervisor, removing user $u")
+      db.removeUser(u)
+      reply(ui.supervisorStartPage(s"ERROR: Rummet har redan handledare: $sup"))
+    }
   }
 
   def studentLogin(name: String, course: String, room: String, state: String): StandardRoute = {
