@@ -1,7 +1,10 @@
 import akka.http.scaladsl.server.StandardRoute
 
-trait SigridActions {
-  self: WebServer =>
+/** The Sigrid web server actions generating a page reply for requests. 
+ *  Mix with WebServer to create a SigridServer instance.
+*/
+trait SigridActions { 
+  self: WebServer => // require this trait to be a WebServer mix-in
 
   def log(msg: String): Unit = println(s"\nSIGRID @ ${Date.now.show}> $msg")
 
@@ -11,7 +14,7 @@ trait SigridActions {
     val u = db.addUser(name)
     log(s"added $u to userNamesToMap=${db.userNamesToMap}")
     
-    val rOpt = db.addRoomIfEmpty(course = course, roomName = room, supervisor = Some(u))
+    val rOpt = db.addRoomIfEmpty(course, room, supervisor = Some(u))
     log(s"room added: $rOpt")
     
     val rOpt2 = 

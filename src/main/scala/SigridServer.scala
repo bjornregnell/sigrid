@@ -1,11 +1,17 @@
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.StandardRoute
 
+/** Sigrid web server url routing, delegating to SigridActions. */
 object SigridServer extends WebServer with SigridActions {
-  private def low(u: String): String = u.toLowerCase 
-  private def cap(n: String): String = n.toLowerCase.capitalize
-  private def up (c: String): String = c.toUpperCase
 
+  // helper methods to make input string formats valid up-front:
+  private def vn(name: String): String   = User.validName(name) 
+  private def vc(course: String): String = RoomKey.validCourse(course)
+  private def vr(room: String): String   = RoomKey.validRoomName(room)
+  private def vs(state: String): String  = state.filter(_.isLetter).toLowerCase
+  private def vu(uid: String): String    = User.validUserId(uid)
+
+  /* Routing of incoming web server requests, delegating to SigridActions. */
   override def routes =
     path("hello") { get { log(s"request: /hello"); reply(ui.helloPage) } }  ~
     path("beppe") { get {
@@ -14,11 +20,11 @@ object SigridServer extends WebServer with SigridActions {
     } } ~
     path("beppe" / "login") { get { 
       parameters("name", "course", "room", "state") { (n, c, r, s) =>
-        supervisorLogin(low(n), up(c), cap(r), low(s))
+        supervisorLogin(vn(n), vc(c), vr(r), vs(s))
     } } } ~
     path("beppe" / "update") { get { 
       parameters("userid", "course", "room", "state") { (u, c, r, s) =>
-        supervisorUpdate(low(u), up(c), cap(r), low(s))
+        supervisorUpdate(vu(u), vc(c), vr(r), vs(s))
     } } } ~
     path("sigrid") { get {
         log(s"request: /sigrid")
@@ -26,11 +32,11 @@ object SigridServer extends WebServer with SigridActions {
     } } ~
     path("sigrid" / "login") { get { 
       parameters("name", "course", "room", "state") { (n, c, r, s) =>
-        studentLogin(low(n), up(c), cap(r), low(s))
+        studentLogin(vn(n), vc(c), vr(r), vs(s))
     } } } ~
     path("sigrid" / "update") { get { 
       parameters("userid", "course", "room", "state") { (u, c, r, s) =>
-        studentUpdate(low(u), up(c), cap(r), low(s))
+        studentUpdate(vu(u), vc(c), vr(r), vs(s))
     } } }
 
 }

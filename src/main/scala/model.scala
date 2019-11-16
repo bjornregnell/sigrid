@@ -7,17 +7,20 @@ case class User(name: String, number: Int){
 
 object User {
   val DefaultUserName = "oddput"
-  val   MaxNameLength = 25
+  val MaxNameLength = 25
  
-  def fromUserId(uid: String): Option[User] = scala.util.Try {
-    val xs = uid.split('-')
-    assert(xs.length == 2)
-    User(validName(xs(0)),xs(1).toInt)
-  }.toOption
-
   def validName(s: String): String = 
     if (s.nonEmpty) s.filter(_.isLetter).take(MaxNameLength).toLowerCase 
     else DefaultUserName
+  
+  def validUserId(s: String): String = 
+    s.filter(c => c.isLetterOrDigit || c == '-').toLowerCase
+
+  def fromUserId(uid: String): Option[User] = scala.util.Try {
+    val xs = validUserId(uid).split('-')
+    assert(xs.length == 2)
+    User(validName(xs(0)),xs(1).toInt)
+  }.toOption
 }
 
 case class RoomKey private (course: String, roomName: String)
@@ -28,7 +31,7 @@ object RoomKey {
   val     DefaultRoom = "Shäraton"
 
   def validCourse(s: String): String = 
-    if (s.nonEmpty) s.filter(c => c.isLetter || c.isDigit).take(MaxCourseLength).toUpperCase 
+    if (s.nonEmpty) s.filter(c => c.isLetterOrDigit).take(MaxCourseLength).toUpperCase 
     else DefaultCourse
   
   def validRoomName(s: String): String = 
