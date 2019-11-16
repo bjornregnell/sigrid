@@ -1,8 +1,8 @@
 object db {
   import scala.util.Try
 
-  private var userMap = new mutable.AtomicMap[String, Vector[Int]]
-  private var roomMap = new mutable.AtomicMap[RoomKey, Room]
+  private var userMap = new mutable.AtomicKeyValueStore[String, Vector[Int]]
+  private var roomMap = new mutable.AtomicKeyValueStore[RoomKey, Room]
   
   def userNamesToMap: Map[String, Vector[Int]] = userMap.toMap
   def roomsToMap: Map[RoomKey, Room] = roomMap.toMap

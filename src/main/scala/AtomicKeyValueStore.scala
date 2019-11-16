@@ -1,7 +1,7 @@
 package mutable
 
 /** A thread-safe key-value store with atomic update in-place. */
-final class AtomicMap[K, V] {
+final class AtomicKeyValueStore[K, V] {
   import scala.jdk.CollectionConverters._
   import scala.jdk.FunctionConverters._
 
