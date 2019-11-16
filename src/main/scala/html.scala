@@ -2,30 +2,31 @@ object html {
     val styles = """
     |body {
     |    background-color: pink;
-    |    font-size: x-large;
+    |    font-size: 25px;
     |    font-family: "Lucida Console", Monaco, monospace;
+    |    margin: 25px 25px;
     |}
     |.button {
     |    background-color: #4CAF50;
     |    border: none;
     |    color: pink;
-    |    padding: 8px 8px;
+    |    padding: 30px 100px;
     |    text-align: center;
     |    text-decoration: none;
     |    display: inline-block;
-    |    font-size: xx-large;
-    |    margin: 8px 8px;
+    |    font-size: 200%;
+    |    margin: 30px 0px;
     |    cursor: pointer;
     |    font-family: "Lucida Console", Monaco, monospace;
     |}
     |.smallinput {
-    |    width: 12%;
-    |    font-size: x-large;
-    |    margin: 2px 2px;
+    |    width: 320px;
+    |    font-size: 120%;
+    |    margin: 5px 5px;
     |}
     |.mediuminput {
-    |    width: 20%;
-    |    font-size: x-large;
+    |    width: 500px;
+    |    font-size: 150%;
     |    margin: 2px 2px;
     |}
     """.stripMargin
