@@ -23,7 +23,9 @@ object User {
   }.toOption
 }
 
-case class RoomKey private (course: String, roomName: String)
+case class RoomKey private (course: String, roomName: String){
+  override def toString = s"</br>&nbsp;RoomKey($course,$roomName)"
+}
 object RoomKey {
   val MaxCourseLength = 25
   val   MaxRoomLength = 20

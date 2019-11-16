@@ -19,9 +19,9 @@ object html {
     |    font-family: "Lucida Console", Monaco, monospace;
     |}
     |.smallinput {
-    |    width: 10%;
+    |    width: 12%;
     |    font-size: medium;
-    |    margin: 1px 1px;
+    |    margin: 2px 2px;
     |}
     |.mediuminput {
     |    width: 20%;

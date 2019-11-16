@@ -1,9 +1,9 @@
 object ui {
   def showRawDatabase: String = s"""
-    <p></br>--- raw database toStrings for debuging ---</br> 
-      <b>users:</b> ${db.users} </br>
+    <p></br>----- raw database toStrings for debugging purposes -----</br> 
+      users: ${db.users.size} ${db.users} </br>
       </br>
-      <b>rooms:</b> ${db.roomsToMap} </br>
+      rooms: ${db.roomsToMap.size} ${db.roomsToMap} </br>
     </p>
     """
 
@@ -11,8 +11,8 @@ object ui {
   |<form action="$action" method="get">
   |  <div>
   |    <p> $msg </p>
-  |    <label for="name"><b>Ditt förnamn:</b> </label>
-  |    <input name="name" id="name" value="" class="mediuminput">
+  |    <label for="name">   <b>Förnamn:</b> </label>
+  |    <input name="name" id="name" value="" class="smallinput">
   |    Exempel: kim
   |    </br>
   |
@@ -21,7 +21,7 @@ object ui {
   |    Exempel: EDAA45
   |    </br>
   |
-  |    <label for="rum"><b>Rum:</b> </label>
+  |    <label for="rum">  &nbsp;&nbsp;&nbsp;  <b>Rum:</b> </label>  
   |    <input name="room" id="room" value="" class="smallinput">
   |    Exempel: Hacke 
   |    </br>
@@ -45,32 +45,32 @@ object ui {
   def studentStartPage(msg: String = "Hej student! Fyll i alla fält:"): String = 
     html.page(
       title = "SIGRID LOGIN", 
-      body =
-        s"""
-          ${sigridHeader("SIGRID")}
-          ${loginForm(msg, action = "/sigrid/login", state = "work")}
-          $showRawDatabase
-        """
+      body =s"""
+        |  ${sigridHeader("SIGRID")}
+        |  ${loginForm(msg, action = "/sigrid/login", state = "work")}
+        |  ${showAllRooms(course = None, exceptRoom = None)}
+        |  $showRawDatabase
+        |""".stripMargin
     )
 
   def supervisorStartPage(msg: String = "Hej handledare! Fyll i alla fält:"): String = 
     html.page(
       title = "BEPPE LOGIN", 
-      body =
-        s"""
-          ${sigridHeader("BEPPE")}
-          ${loginForm(msg, action = "/beppe/login", state = "supervising")}
-          $showRawDatabase
-        """
+      body = s"""
+       |   ${sigridHeader("BEPPE")}
+       |   ${loginForm(msg, action = "/beppe/login", state = "supervising")}
+       |   ${showAllRooms(course = None, exceptRoom = None)}
+       |   $showRawDatabase
+       |""".stripMargin
     )
 
   def showQueueLength(qname: String, n: Int): String = s"""
     ${html.boldIf(n > 0)(qname)}: $n
   """
   
-  def showRoomShort(r: Room): String = s"""
+  def showRoomShort(r: Room, isShowCourse: Boolean = false): String = s"""
     &nbsp; &nbsp;
-    ${r.name}: ${r.students.size} studenter, 
+    ${if (isShowCourse) r.course else ""} ${r.name}: ${r.students.size} studenter, 
     handl ${r.supervisor.map(_.id).getOrElse("<b>SAKNAS</b>")}, 
     ${showQueueLength("hjälp",r.helpQueue.length)},
     ${showQueueLength("redov", r.approvalQueue.length)}  
@@ -101,7 +101,7 @@ object ui {
     def courseFilter(r: Room): Boolean = course.map(_ == r.course).getOrElse(true) 
     val table = db.rooms
       .filter(r => roomFilter(r) && courseFilter(r))
-      .map(showRoomShort)
+      .map(r => showRoomShort(r, course.isEmpty))
       .mkString(delim)
     val heading = 
       if (table.nonEmpty) 
@@ -122,11 +122,14 @@ object ui {
       |    <input type="hidden" name="course" value="$course">
       |    <input type="hidden" name="room" value="$room">
       |
-      |    <input type="radio" name="state" value="work"  ${check("work")}> Ej i kö. Jobbar!<br>
-      |    <input type="radio" name="state" value="help"  ${check("help")}> Hjälpkö. Vill ha hjälp!<br>
-      |    <input type="radio" name="state" value="ready" ${check("ready")}> Redovisningskö. Fääärdiiig! <br>  
-      |    <input type="radio" name="state" value="exit"  ${check("exit")}> Lämna rummet. Hejdå!<br>  
-      |    </br>
+      |    <input type="radio" name="state" value="work"  ${check("work")}>  <b>Jobba på!</b> Står inte i någon kö.<br>
+      |    <input type="radio" name="state" value="help"  ${check("help")}> <b>Hjäälp!!!</b> Står i hjälpkön.<br>
+      |    <input type="radio" name="state" value="ready" ${check("ready")}> <b>Fäärdiig!</b> Står i redovisningskön. <br>  
+      |    <input type="radio" name="state" value="exit"  ${check("exit")}> <b>TackÅHej!</b> Lämnar rummet och loggar ut från Sigrid. <br>  
+      |
+      |   <p>Glöm inte <i>Jobba på! + Uppdatera</i> när du fått hjälp.</br>
+      |      Glöm inte <i>TackÅHej! + Uppdatera</i> när du är klar.</p>
+      |
       |    <button class="button">Uppdatera</button>
       |  </div>
       |</form>
