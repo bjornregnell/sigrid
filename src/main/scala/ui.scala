@@ -35,11 +35,7 @@ object ui {
 
   def sigridHeader(heading: String): String = s"""
     ${html.h1(s"* $heading *")}
-    <p> ${html.link("/hello", "Sigrid")} är en hjälpköwebbapp @ ${new java.util.Date} </p>
-    <p> Kolla koden: 
-    ${html.link(
-      url="https://github.com/bjornregnell/sigrid/", 
-      text="github.com/bjornregnell/sigrid")} </p>
+    <p> ${html.link("https://github.com/bjornregnell/sigrid/", "Sigrid")} är en hjälpköwebbapp @ ${Date.now.show} </p>
   """
 
   def studentStartPage(msg: String = "Hej student! Fyll i alla fält:"): String = 
