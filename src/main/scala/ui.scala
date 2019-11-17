@@ -153,7 +153,7 @@ object ui {
       |        <b>Jubba!</b> Handledare handleder!<br>
       | 
       |  <input type="radio" name="state" value="gone"  ${check("gone")}> 
-      |        <b>Hejdå!</b> Handledare försvinner!<br> 
+      |        <b>Hejdå!</b> Rummet raderas!<br> 
       |  
       |   <p>Glöm inte <i>Hejdå! + Uppdatera</i> när undervisningen är klar.</p>
       |
