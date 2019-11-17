@@ -38,7 +38,7 @@ object ui {
     <p> ${html.link("https://github.com/bjornregnell/sigrid/", "Sigrid")} är en hjälpköwebbapp @ ${Date.now.show} </p>
   """
 
-  def studentStartPage(msg: String = "Hej student! Fyll i alla fält:"): String = 
+  def studentStartPage(msg: String = "Hej student!"): String = 
     html.page(
       title = "SIGRID LOGIN", 
       body =s"""
@@ -49,7 +49,7 @@ object ui {
         |""".stripMargin
     )
 
-  def supervisorStartPage(msg: String = "Hej handledare! Fyll i alla fält:"): String = 
+  def supervisorStartPage(msg: String = "Hej handledare!"): String = 
     html.page(
       title = "BEPPE LOGIN", 
       body = s"""
