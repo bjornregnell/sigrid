@@ -101,7 +101,7 @@ object ui {
       .mkString(delim)
     val heading = 
       if (table.nonEmpty) 
-        s"""&nbsp;${if (exceptRoom.nonEmpty) "Övriga" else "Alla"} rum:</br>"""
+        s"""&nbsp;${if (exceptRoom.nonEmpty) "Övriga" else "Aktiva"} rum:</br>"""
       else ""
     s"$heading \n $table"
   }
