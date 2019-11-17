@@ -118,10 +118,10 @@ object ui {
       |    <input type="hidden" name="course" value="$course">
       |    <input type="hidden" name="room" value="$room">
       |<div class="radiobutton">
-      |    <p><input type="radio" class="radiobutton" name="state" value="work"  ${check("work")}>  <b>Jobba på!</b> Stå inte i någon kö.</p>
-      |    <p><input type="radio" name="state" value="help"  ${check("help")}> <b>Hjäälp!!!</b> Stå i hjälpkön.</p>
-      |    <p><input type="radio" class="radiobutton" name="state" value="ready" ${check("ready")}> <b>Fäärdiig!</b> Stå i redovisningskön. </p>  
-      |    <p><input type="radio" class="radiobutton" name="state" value="exit"  ${check("exit")}> <b>TackÅHej!</b> Logga ut från Sigrid. </p>  
+      |    <p><input type="radio" class="radiobutton" name="state" value="work"  ${check("work")}>  &nbsp;<b>Jobba på!</b> Stå inte i någon kö.</p>
+      |    <p><input type="radio" name="state" value="help"  ${check("help")}> &nbsp;<b>Hjäälp!!!</b> Stå i hjälpkön.</p>
+      |    <p><input type="radio" class="radiobutton" name="state" value="ready" ${check("ready")}> &nbsp;<b>Fäärdiig!</b> Stå i redovisningskön. </p>  
+      |    <p><input type="radio" class="radiobutton" name="state" value="exit"  ${check("exit")}> &nbsp;<b>TackÅHej!</b> Logga ut från Sigrid. </p>  
       |</div>
       |   <p>Glöm ej <i>Jobba på! + Update</i> när du fått hjälp.</br>
       |      Glöm ej <i>TackÅHej! + Update</i> när du är klar.</p>
