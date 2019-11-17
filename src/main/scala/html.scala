@@ -1,5 +1,6 @@
 object html {
     val styles = """
+    |html { -webkit-font-smoothing: antialiased; }
     |body {
     |    background-color: pink;
     |    font-size: 28px;
@@ -35,6 +36,7 @@ object html {
     |    font-size: 28px;
     |}
     |input[type='radio'] { transform: scale(1.5); }
+    |input { font-size: 28px; }
     """.stripMargin
 
   def page(body: String, title: String): String = s"""<!DOCTYPE html>
