@@ -2,7 +2,7 @@ object html {
     val styles = """
     |body {
     |    background-color: pink;
-    |    font-size: 20px;
+    |    font-size: 24px;
     |    line-height: 1.2;
     |    font-family: "Lucida Console", Monaco, monospace;
     |    margin: 20px 20px;
@@ -22,7 +22,7 @@ object html {
     |    font-family: "Lucida Console", Monaco, monospace;
     |}
     |.smallinput {
-    |    width: 320px;
+    |    width: 240px;
     |    font-size: 120%;
     |    margin: 5px 5px;
     |}
