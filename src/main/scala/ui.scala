@@ -118,15 +118,15 @@ object ui {
       |    <input type="hidden" name="course" value="$course">
       |    <input type="hidden" name="room" value="$room">
       |<div class="radiobutton">
-      |    <input type="radio" class="radiobutton" name="state" value="work"  ${check("work")}>  <b>Jobba på!</b> Stå inte i någon kö.<br>
-      |    <input type="radio" name="state" value="help"  ${check("help")}> <b>Hjäälp!!!</b> Stå i hjälpkön.<br>
-      |    <input type="radio" class="radiobutton" name="state" value="ready" ${check("ready")}> <b>Fäärdiig!</b> Stå i redovisningskön. <br>  
-      |    <input type="radio" class="radiobutton" name="state" value="exit"  ${check("exit")}> <b>TackÅHej!</b> Logga ut från Sigrid. <br>  
+      |    <p><input type="radio" class="radiobutton" name="state" value="work"  ${check("work")}>  <b>Jobba på!</b> Stå inte i någon kö.</p>
+      |    <p><input type="radio" name="state" value="help"  ${check("help")}> <b>Hjäälp!!!</b> Stå i hjälpkön.</p>
+      |    <p><input type="radio" class="radiobutton" name="state" value="ready" ${check("ready")}> <b>Fäärdiig!</b> Stå i redovisningskön. </p>  
+      |    <p><input type="radio" class="radiobutton" name="state" value="exit"  ${check("exit")}> <b>TackÅHej!</b> Logga ut från Sigrid. </p>  
       |</div>
-      |   <p>Glöm ej <i>Jobba på! + Updejt</i> när du fått hjälp.</br>
-      |      Glöm ej <i>TackÅHej! + Updejt</i> när du är klar.</p>
+      |   <p>Glöm ej <i>Jobba på! + Update</i> när du fått hjälp.</br>
+      |      Glöm ej <i>TackÅHej! + Update</i> när du är klar.</p>
       |
-      |    <button class="button">Updejt</button>
+      |    <button class="button">Update</button>
       |  </div>
       |</form>
       |<p> ${course} ${Date.now.show} </p>

@@ -35,7 +35,7 @@ object html {
     |.radiobutton {
     |    font-size: 28px;
     |}
-    |input[type='radio'] { transform: scale(1.5); }
+    |input[type='radio'] { transform: scale(4, 2); }
     |input { font-size: 28px; }
     """.stripMargin
 
