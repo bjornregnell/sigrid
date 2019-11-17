@@ -76,6 +76,11 @@ case class Room(
     supervisor = supervisor.flatMap(s => if (s == u) None else Some(s))
   )
 
+  def isExpired: Boolean = {
+    val h = created.hour
+    ???
+  }
+
   override def toString = 
     s"Room($course, $name, supervisor=$supervisor, students=$students), helpQueue=$helpQueue, approvalQueue=$approvalQueue, created=${created})"
 }

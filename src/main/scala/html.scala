@@ -18,7 +18,7 @@ object html {
     |    display: inline-block;
     |    font-size: 150%;
     |    font-weight:bold;
-    |    margin: 20px 0px;
+    |    margin: 10px 2px;
     |    cursor: pointer;
     |    font-family: "Lucida Console", Monaco, monospace;
     |}
@@ -32,12 +32,32 @@ object html {
     |    font-size: 150%;
     |    margin: 2px 2px;
     |}
-    |.radiobutton {
-    |    font-size: 28px;
-    |}
-    |input[type='radio'] { transform: scale(4, 2); }
-    |input { font-size: 28px; }
+    .radio-toolbar input[type="radio"] {
+      opacity: 0;
+      position: fixed;
+      width: 0;
+    }
+    .radio-toolbar label {
+      display: inline-block;
+      background-color:  #ddd;
+      padding: 10px 20px;
+      font-size: 32px;
+      border: 8px solid #444;
+      border-radius: 8px;
+    }
+    .radio-toolbar input[type="radio"]:checked + label {
+      background-color: #fcba03;
+      border-color: #4c4;
+    }
+    .radio-toolbar input[type="radio"]:focus + label {
+      border: 8px dashed #444;
+    }
     """.stripMargin
+
+    /*     |#input[type='radio'] { 
+    |#transform: scale(4, 2); 
+    |#}
+    */
 
   def page(body: String, title: String): String = s"""<!DOCTYPE html>
     |<html><head><meta charset="UTF-8"><title>$title</title>

@@ -113,21 +113,31 @@ object ui {
     html.page(title = s"SIGRID: $userid $state", body = s"""
       |${html.h1(s"STUDENT $userid i $room")}
       |<form action="update" method="get">
-      |  <div>
-      |    <input type="hidden" name="userid" value="$userid">
-      |    <input type="hidden" name="course" value="$course">
-      |    <input type="hidden" name="room" value="$room">
-      |<div class="radiobutton">
-      |    <p><input type="radio" class="radiobutton" name="state" value="work"  ${check("work")}>  &nbsp;<b>Jobba på!</b> Stå inte i någon kö.</p>
-      |    <p><input type="radio" name="state" value="help"  ${check("help")}> &nbsp;<b>Hjäälp!!!</b> Stå i hjälpkön.</p>
-      |    <p><input type="radio" class="radiobutton" name="state" value="ready" ${check("ready")}> &nbsp;<b>Fäärdiig!</b> Stå i redovisningskön. </p>  
-      |    <p><input type="radio" class="radiobutton" name="state" value="exit"  ${check("exit")}> &nbsp;<b>TackÅHej!</b> Logga ut från Sigrid. </p>  
-      |</div>
-      |   <p>Glöm ej <i>Jobba på! + Update</i> när du fått hjälp.</br>
-      |      Glöm ej <i>TackÅHej! + Update</i> när du är klar.</p>
+      |<div>
+      |  <input type="hidden" name="userid" value="$userid">
+      |  <input type="hidden" name="course" value="$course">
+      |  <input type="hidden" name="room" value="$room">
       |
-      |    <button class="button">Update</button>
-      |  </div>
+      |  <div class="radio-toolbar">
+      |
+      |  <p><input type="radio" id="radioWork" name="state" value="work"  ${check("work")}>  
+      |  <label for="radioWork"><b>Jobba på!</b></label>&nbsp; Stå inte i någon kö.</p>
+      |
+      |  <p><input type="radio" id="radioHelp" name="state" value="help"  ${check("help")}> 
+      |  <label for="radioHelp"><b>Hjäälp!!!</b></label>&nbsp; Stå i hjälpkön.</p>
+      |
+      |  <p><input type="radio" id="radioReady" name="state" value="ready" ${check("ready")}> 
+      |  <label for="radioReady"><b>Fäärdiig!</b></label>&nbsp; Stå i redovisningskön. </p> 
+      | 
+      |  <p><input type="radio" id="radioExit" name="state" value="exit"  ${check("exit")}> 
+      |  <label for="radioExit"><b>TackÅHej!</b></label>&nbsp; Lämna rummet. </p> 
+      | 
+      |</div>
+      |   <p>Glöm ej <i>Jobba på! + Uppdatera</i> när du fått hjälp.</br>
+      |      Glöm ej <i>TackÅHej! + Uppdatera</i> när du är klar.</p>
+      |
+      |    <button class="button">Uppdatera</button>
+      |</div>
       |</form>
       |<p> ${course} ${Date.now.show} </p>
       |${showRoomLong(roomName = room, course = course)}
@@ -136,6 +146,8 @@ object ui {
       |""".stripMargin
     )
   }
+//           &nbsp;<b>Jobba på!</b> Stå inte i någon kö.</p>
+//
 
   def supervisorUpdatePage(userid: String, course: String, room: String, state: String): String = {
     def check(value: String) = if (value == state) """checked="checked" """ else ""
@@ -143,17 +155,17 @@ object ui {
     html.page(title = s"BEPPE: $userid $state", body = s"""
       |${html.h1(s"HANDLEDARE $userid i $room")}
       |<form action="update" method="get">
-      |  <div>
+      |  <div class="radio-toolbar">
       |
       |  <input type="hidden" name="userid" value="$userid">
       |  <input type="hidden" name="course" value="$course">
       |  <input type="hidden" name="room" value="$room">
       |
-      |  <input type="radio" name="state" value="supervising" ${check("supervising")}>
-      |        <b>Jubba!</b> Handledare handleder!<br>
+      |  <p><input type="radio" id="radioSup" name="state" value="supervising" ${check("supervising")}>
+      |  <label for="radioSup"><b>Jubba!</b></label> &nbsp; Handledare handleder!</p>
       | 
-      |  <input type="radio" name="state" value="gone"  ${check("gone")}> 
-      |        <b>Hejdå!</b> Rummet raderas!<br> 
+      |  <p><input type="radio" id="radioGone" name="state" value="gone"  ${check("gone")}> 
+      |  <label for="radioGone"><b>Hejdå!</b></label> &nbsp; Rummet raderas!</p> 
       |  
       |   <p>Glöm inte <i>Hejdå! + Uppdatera</i> när undervisningen är klar.</p>
       |
