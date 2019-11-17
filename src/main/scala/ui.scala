@@ -122,10 +122,10 @@ object ui {
       |    <input type="hidden" name="course" value="$course">
       |    <input type="hidden" name="room" value="$room">
       |
-      |    <input type="radio" name="state" value="work"  ${check("work")}>  <b>Jobba på!</b> Står inte i någon kö.<br>
+      |    <input type="radio" class="radiobutton" name="state" value="work"  ${check("work")}>  <b>Jobba på!</b> Står inte i någon kö.<br>
       |    <input type="radio" name="state" value="help"  ${check("help")}> <b>Hjäälp!!!</b> Står i hjälpkön.<br>
-      |    <input type="radio" name="state" value="ready" ${check("ready")}> <b>Fäärdiig!</b> Står i redovisningskön. <br>  
-      |    <input type="radio" name="state" value="exit"  ${check("exit")}> <b>TackÅHej!</b> Lämnar rummet och loggar ut från Sigrid. <br>  
+      |    <input type="radio" class="radiobutton" name="state" value="ready" ${check("ready")}> <b>Fäärdiig!</b> Står i redovisningskön. <br>  
+      |    <input type="radio" class="radiobutton" name="state" value="exit"  ${check("exit")}> <b>TackÅHej!</b> Lämnar rummet och loggar ut från Sigrid. <br>  
       |
       |   <p>Glöm inte <i>Jobba på! + Uppdatera</i> när du fått hjälp.</br>
       |      Glöm inte <i>TackÅHej! + Uppdatera</i> när du är klar.</p>

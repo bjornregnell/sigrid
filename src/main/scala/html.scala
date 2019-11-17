@@ -2,7 +2,7 @@ object html {
     val styles = """
     |body {
     |    background-color: pink;
-    |    font-size: 24px;
+    |    font-size: 28px;
     |    line-height: 1.2;
     |    font-family: "Lucida Console", Monaco, monospace;
     |    margin: 20px 20px;
@@ -22,14 +22,17 @@ object html {
     |    font-family: "Lucida Console", Monaco, monospace;
     |}
     |.smallinput {
-    |    width: 240px;
-    |    font-size: 120%;
+    |    width: 180px;
+    |    font-size: 28px;
     |    margin: 5px 5px;
     |}
     |.mediuminput {
     |    width: 500px;
     |    font-size: 150%;
     |    margin: 2px 2px;
+    |}
+    |.radiobutton {
+    |    font-size: 28px;
     |}
     |input[type='radio'] { transform: scale(1.5); }
     """.stripMargin
@@ -57,7 +60,7 @@ object html {
     |    <style>
     |      body {background-color: pink;}
     |      h1 {color: red;}
-    |      p {color: blue;}
+    |      p {color: green;}
     |    </style>
     |  </head>
     |  <body>
