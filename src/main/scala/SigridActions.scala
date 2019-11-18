@@ -46,20 +46,41 @@ trait SigridActions {
   def supervisorUpdate(u: String, c: String, r: String, s: String): StandardRoute = {
     log(s"request: /beppe/room?userid=$u&course=$c&room=$r&state=$s")
     s match {
-      case "gone" => 
-        log(s"hejdå handledare $u")
-        val uOpt = User.fromUserId(u)
-        val okOpt = uOpt.map(db.removeUser)
-        if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
-        reply(ui.supervisorStartPage(s"Handledare $u har sagt hejdå."))
-      
       case "supervising" => 
         log(s"supervising $u")
         reply(ui.supervisorUpdatePage(u, c, r, s)) 
 
+      case "clearhelp" => 
+        log(s"clearhelp chosen by supervisor $u")
+        val rOpt = db.clearHelpQueue(c,r)
+        val err: String = if (rOpt.isEmpty) s"Error: $u" else u
+        log(s"$err cleared help queue in $rOpt")
+        reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
+
+      case "clearready" => 
+        log(s"clearready chosen by supervisor $u")
+        val rOpt = db.clearApprovalQueue(c,r)
+        val err: String = if (rOpt.isEmpty) s"Error: $u" else u
+        log(s"$err cleared ready queue in $rOpt")
+        reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
+
+      case "gone" => 
+        log(s"gone supervisor $u")
+        val uOpt = User.fromUserId(u)
+        val okOpt = uOpt.map(db.removeUser)
+        if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
+        reply(ui.supervisorStartPage(s"Handledare $u har sagt hejdå."))
+
+      case "purge" => 
+        log(s"purge supervisor $u room $c $r ")
+        val rOpt = db.removeRoom(c, r)
+        val err: String = if (rOpt.isEmpty) s"Error: $u" else u
+        log(s"$err removed room $c $rOpt")
+        reply(ui.supervisorStartPage(s"Rummet raderades av $u")) 
+
       case _ => 
         log(s"ERROR: supervisor state unknown: $s")
-        reply(ui.studentUpdatePage(u, c, r, s)) 
+        reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
    }
   }
 
@@ -93,7 +114,7 @@ trait SigridActions {
 
       case _ => 
         log(s"ERROR: student state unknown: $s")
-        reply(ui.studentUpdatePage(u, c, r, s)) 
+        reply(ui.studentUpdatePage(u, c, r, "work")) 
     }
   }
 
