@@ -76,6 +76,10 @@ case class Room(
     supervisor = supervisor.flatMap(s => if (s == u) None else Some(s))
   )
 
+  def clearHelpQueue(): Room = copy(helpQueue = Vector())
+
+  def clearApprovalQueue(): Room = copy(approvalQueue = Vector())
+
   def isExpired: Boolean = {
     val h = created.hour
     ???
