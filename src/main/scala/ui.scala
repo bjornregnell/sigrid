@@ -112,6 +112,7 @@ object ui {
 
     html.page(title = s"SIGRID: $userid $state", body = s"""
       |${html.h1(s"STUDENT $userid i $room")}
+      |<p>Välj tillstånd och klicka på gröna <i>Uppdatera</i>-knappen.</p> 
       |<form action="update" method="get">
       |<div>
       |  <input type="hidden" name="userid" value="$userid">
@@ -124,10 +125,10 @@ object ui {
       |  <label for="radioWork"><b>Jobba på!</b></label>&nbsp; Stå inte i någon kö.</p>
       |
       |  <p><input type="radio" id="radioHelp" name="state" value="help"  ${check("help")}> 
-      |  <label for="radioHelp"><b>Hjäälp!!!</b></label>&nbsp; Stå i hjälpkön.</p>
+      |  <label for="radioHelp"><b>Hjäälp!!!</b></label>&nbsp; Ställ mig i hjälpkön.</p>
       |
       |  <p><input type="radio" id="radioReady" name="state" value="ready" ${check("ready")}> 
-      |  <label for="radioReady"><b>Fäärdiig!</b></label>&nbsp; Stå i redovisningskön. </p> 
+      |  <label for="radioReady"><b>Fäärdiig!</b></label>&nbsp; Ställ mig i redovisningskön. </p> 
       | 
       |  <p><input type="radio" id="radioExit" name="state" value="exit"  ${check("exit")}> 
       |  <label for="radioExit"><b>TackÅHej!</b></label>&nbsp; Lämna rummet. </p> 
@@ -162,12 +163,21 @@ object ui {
       |  <input type="hidden" name="room" value="$room">
       |
       |  <p><input type="radio" id="radioSup" name="state" value="supervising" ${check("supervising")}>
-      |  <label for="radioSup"><b>Jubba!</b></label> &nbsp; Handledare handleder!</p>
+      |  <label for="radioSup"><b>Jubba!</b></label> &nbsp; Handledare handleder.</p>
+      |
+      |  <p><input type="radio" id="radioClearHelp" name="state" value="clearhelp" ${check("clearhelp")}>
+      |  <label for="radioClearHelp"><b>Töm hjälpkö!</b></label> &nbsp; Töm hjälpkön.</p>
+      |
+      |  <p><input type="radio" id="radioClearReady" name="state" value="clearready" ${check("clearready")}>
+      |  <label for="radioClearReady"><b>Töm redovkö!</b></label> &nbsp; Töm redovisningskön.</p>
       | 
       |  <p><input type="radio" id="radioGone" name="state" value="gone"  ${check("gone")}> 
-      |  <label for="radioGone"><b>Hejdå!</b></label> &nbsp; Rummet raderas!</p> 
+      |  <label for="radioGone"><b>Hejdå!</b></label> &nbsp; Handledare lämnar rummet, men rummet finns kvar.</p> 
       |  
-      |   <p>Glöm inte <i>Hejdå! + Uppdatera</i> när undervisningen är klar.</p>
+      |  <p><input type="radio" id="radioPurge" name="state" value="purge"  ${check("purge")}> 
+      |  <label for="radioPurge"><b>Radera!</b></label> &nbsp; Radera rummet och dess köer.</p> 
+      |
+      |   <p>Glöm ej <i>Radera! + Uppdatera</i> när undervisningen är klar.</p>
       |
       |   <button class="button">Uppdatera</button>
       |  </div>

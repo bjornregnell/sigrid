@@ -10,7 +10,7 @@ object html {
     |}
     |.button {
     |    background-color: #4CAF50;
-    |    border: none;
+    |    border: 8px solid #444;
     |    color: pink;
     |    padding: 20px 80px;
     |    text-align: center;
@@ -43,7 +43,7 @@ object html {
       padding: 10px 20px;
       font-size: 32px;
       border: 8px solid #444;
-      border-radius: 8px;
+      border-radius: 38px;
     }
     .radio-toolbar input[type="radio"]:checked + label {
       background-color: #fcba03;
