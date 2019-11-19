@@ -6,6 +6,7 @@ object db {
   
   def userNamesToMap: Map[String, Vector[Int]] = userStore.toMap
   def roomsToMap: Map[RoomKey, Room] = roomStore.toMap
+  def roomKeys: Set[RoomKey] = roomsToMap.keySet
   
   def users: Set[User] = userNamesToMap.map { 
     case (n, xs) => n -> xs.map(i => User(n, i))
@@ -27,6 +28,9 @@ object db {
     val ns = userStore.get(u.name).getOrElse(Vector())
     ns.contains(u.number)   
   }
+
+  def hasRoom(course: String, roomName: String): Boolean = 
+    roomKeys.contains(RoomKey(course, roomName))
 
   def removeUser(u: User): Boolean = {
     var existed = false

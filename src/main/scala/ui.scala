@@ -1,4 +1,9 @@
 object ui {
+
+  val validStudentState = Set("work", "help", "ready", "exit")
+  
+  val validSupervisorState = Set("supervising", "clearhelp", "clearready", "gone", "purge")
+ 
   def showRawDatabase: String = s"""
     <p></br>----- raw database toStrings for debugging purposes -----</br> 
       users: ${db.users.size} ${db.users} </br>
@@ -12,17 +17,17 @@ object ui {
   |  <div>
   |    <p> $msg </p>
   |    <label for="name">   <b>Förnamn:</b> </label>
-  |    <input name="name" id="name" value="" class="smallinput">
+  |    <input name="name" id="name" value="" class="smallinput" required>
   |    Exempel: kim
   |    </br>
   |
   |    <label for="kurskod"><b>Kurskod:</b> </label>
-  |    <input name="course" id="course" value="" class="smallinput">
+  |    <input name="course" id="course" value="" class="smallinput" required>
   |    Exempel: EDAA45
   |    </br>
   |
   |    <label for="rum">  &nbsp;&nbsp;&nbsp;  <b>Rum:</b> </label>  
-  |    <input name="room" id="room" value="" class="smallinput">
+  |    <input name="room" id="room" value="" class="smallinput"  required>
   |    Exempel: Hacke 
   |    </br>
   |
@@ -58,7 +63,7 @@ object ui {
        |   ${showAllRooms(course = None, exceptRoom = None)}
        |   $showRawDatabase
        |""".stripMargin
-    )
+    ) 
 
   def showQueueLength(qname: String, n: Int): String = s"""
     ${html.boldIf(n > 0)(qname)}: $n
@@ -172,7 +177,7 @@ object ui {
       |  <label for="radioClearReady"><b>Töm redovkö!</b></label> &nbsp; Töm redovisningskön.</p>
       | 
       |  <p><input type="radio" id="radioGone" name="state" value="gone"  ${check("gone")}> 
-      |  <label for="radioGone"><b>Hejdå!</b></label> &nbsp; Handledare lämnar rummet, men rummet finns kvar.</p> 
+      |  <label for="radioGone"><b>Hejdå!</b></label> &nbsp; Handledare lämnar,  rummet finns kvar.</p> 
       |  
       |  <p><input type="radio" id="radioPurge" name="state" value="purge"  ${check("purge")}> 
       |  <label for="radioPurge"><b>Radera!</b></label> &nbsp; Radera rummet och dess köer.</p> 

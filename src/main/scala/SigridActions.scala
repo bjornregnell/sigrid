@@ -43,79 +43,101 @@ trait SigridActions {
     reply(ui.studentUpdatePage(u.id, course, room, state))
   }
 
+  def errorMessageIfMissing(u: String, c: String, r: String, s: String, isValidState: Set[String]): Option[String] = {
+    val uidOpt: Option[User] = User.fromUserId(u)
+    val hasUser: Boolean = uidOpt.map(uid => db.hasUser(uid)).getOrElse(false)
+    val result = 
+      if (!db.hasRoom(c, r)) Some(s"ERROR: Rum $r i kurs $c saknas!")
+      else if (!hasUser) Some(s"ERROR: $u saknas!")
+      else if (!isValidState(s)) Some(s"ERROR: okänt tillstånd: $s")
+      else None
+    result.foreach(log)
+    result
+  }
+
   def supervisorUpdate(u: String, c: String, r: String, s: String): StandardRoute = {
     log(s"request: /beppe/room?userid=$u&course=$c&room=$r&state=$s")
-    s match {
-      case "supervising" => 
-        log(s"supervising $u")
-        reply(ui.supervisorUpdatePage(u, c, r, s)) 
+    errorMessageIfMissing(u: String, c: String, r: String, s: String,
+                          ui.validSupervisorState)
+      .map(errMsg => reply(ui.supervisorStartPage(errMsg)))
+      .getOrElse (
+        s match {
+          case "supervising" => 
+            log(s"supervising $u")
+            reply(ui.supervisorUpdatePage(u, c, r, s)) 
 
-      case "clearhelp" => 
-        log(s"clearhelp chosen by supervisor $u")
-        val rOpt = db.clearHelpQueue(c,r)
-        val err: String = if (rOpt.isEmpty) s"Error: $u" else u
-        log(s"$err cleared help queue in $rOpt")
-        reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
+          case "clearhelp" => 
+            log(s"clearhelp chosen by supervisor $u")
+            val rOpt = db.clearHelpQueue(c,r)
+            val err: String = if (rOpt.isEmpty) s"Error: $u" else u
+            log(s"$err cleared help queue in $rOpt")
+            reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
 
-      case "clearready" => 
-        log(s"clearready chosen by supervisor $u")
-        val rOpt = db.clearApprovalQueue(c,r)
-        val err: String = if (rOpt.isEmpty) s"Error: $u" else u
-        log(s"$err cleared ready queue in $rOpt")
-        reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
+          case "clearready" => 
+            log(s"clearready chosen by supervisor $u")
+            val rOpt = db.clearApprovalQueue(c,r)
+            val err: String = if (rOpt.isEmpty) s"Error: $u" else u
+            log(s"$err cleared ready queue in $rOpt")
+            reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
 
-      case "gone" => 
-        log(s"gone supervisor $u")
-        val uOpt = User.fromUserId(u)
-        val okOpt = uOpt.map(db.removeUser)
-        if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
-        reply(ui.supervisorStartPage(s"Handledare $u har sagt hejdå."))
+          case "gone" => 
+            log(s"gone supervisor $u")
+            val uOpt = User.fromUserId(u)
+            val okOpt = uOpt.map(db.removeUser)
+            if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
+            reply(ui.supervisorStartPage(s"Handledare $u har sagt hejdå."))
 
-      case "purge" => 
-        log(s"purge supervisor $u room $c $r ")
-        val rOpt = db.removeRoom(c, r)
-        val err: String = if (rOpt.isEmpty) s"Error: $u" else u
-        log(s"$err removed room $c $rOpt")
-        reply(ui.supervisorStartPage(s"Rummet raderades av $u")) 
+          case "purge" => 
+            log(s"purge supervisor $u room $c $r ")
+            val rOpt = db.removeRoom(c, r)
+            val err: String = if (rOpt.isEmpty) s"Error: $u" else u
+            log(s"$err removed room $c $rOpt")
+            reply(ui.supervisorStartPage(s"Rummet raderades av $u")) 
 
-      case _ => 
-        log(s"ERROR: supervisor state unknown: $s")
-        reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
-   }
+          case _ => 
+            log(s"ERROR: supervisor state unknown: $s")
+            reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
+        }
+      )
   }
 
   def studentUpdate(u: String, c: String, r: String, s: String): StandardRoute = {
     log(s"request: /sigrid/room?userid=$u&course=$c&room=$r&state=$s")
-    s match {
-      case "exit" => 
-        log(s"hejdå student $u")
-        val uOpt = User.fromUserId(u)
-        val okOpt = uOpt.map(db.removeUser)
-        if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
-        reply(ui.studentStartPage(s"Student $u har sagt hejdå."))
-      
-      case "help" => 
-        val uOpt = User.fromUserId(u)
-        val rOpt = uOpt.flatMap(u => db.wantHelp(u, c, r))
-        log(s"help $u changed room to $rOpt")
-        reply(ui.studentUpdatePage(u, c, r, s))
+    errorMessageIfMissing(u: String, c: String, r: String, s: String,
+                          ui.validStudentState)
+      .map(errMsg => reply(ui.studentStartPage(errMsg)))
+      .getOrElse (
+        s match {
+          case "exit" => 
+            log(s"hejdå student $u")
+            val uOpt = User.fromUserId(u)
+            val okOpt = uOpt.map(db.removeUser)
+            if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
+            reply(ui.studentStartPage(s"Student $u har sagt hejdå."))
+          
+          case "help" => 
+            val uOpt = User.fromUserId(u)
+            val rOpt = uOpt.flatMap(u => db.wantHelp(u, c, r))
+            log(s"help $u changed room to $rOpt")
+            reply(ui.studentUpdatePage(u, c, r, s))
 
-      case "ready" => 
-        val uOpt = User.fromUserId(u)
-        val rOpt = uOpt.flatMap(u => db.wantApproval(u, c, r))
-        log(s"ready $u changed room to $rOpt")
-        reply(ui.studentUpdatePage(u, c, r, s))
+          case "ready" => 
+            val uOpt = User.fromUserId(u)
+            val rOpt = uOpt.flatMap(u => db.wantApproval(u, c, r))
+            log(s"ready $u changed room to $rOpt")
+            reply(ui.studentUpdatePage(u, c, r, s))
 
-      case "work" => 
-        val uOpt = User.fromUserId(u)
-        val rOpt = uOpt.flatMap(u => db.working(u, c, r))
-        log(s"work $u changed room to $rOpt")
-        reply(ui.studentUpdatePage(u, c, r, s)) 
+          case "work" => 
+            val uOpt = User.fromUserId(u)
+            val rOpt = uOpt.flatMap(u => db.working(u, c, r))
+            log(s"work $u changed room to $rOpt")
+            reply(ui.studentUpdatePage(u, c, r, s)) 
 
-      case _ => 
-        log(s"ERROR: student state unknown: $s")
-        reply(ui.studentUpdatePage(u, c, r, "work")) 
-    }
+          case _ => 
+            log(s"ERROR: student state unknown: $s")
+            reply(ui.studentUpdatePage(u, c, r, "work")) 
+        }
+      )
   }
 
 }
