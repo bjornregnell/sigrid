@@ -60,6 +60,21 @@ object db {
     n
   }
 
+  def purgeRemovableRooms(): Int = {  // TODO test this
+    var n = 0
+    roomKeys.foreach { rk =>
+      roomStore.update(rk){ rOpt => 
+        rOpt.flatMap { r =>
+          if (r.isRemovable) { 
+            n += 1
+            None 
+          } else Some(r)
+        }
+      }
+    }
+    n
+ }
+
   /** Remove room if existing, returns deleted room or None if non-existing.*/
   def removeRoom(course: String, roomName: String): Option[Room] = {
     val rk = RoomKey(course, roomName)

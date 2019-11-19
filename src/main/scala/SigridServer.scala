@@ -16,6 +16,7 @@ object SigridServer extends WebServer with SigridActions {
     path("hello") { get { log(s"request: /hello"); reply(ui.helloPage) } }  ~
     path("beppe") { get {
       log(s"request: /beppe")
+      db.purgeRemovableRooms()
       reply(ui.supervisorStartPage()) 
     } } ~
     path("beppe" / "login") { get { 
@@ -28,6 +29,7 @@ object SigridServer extends WebServer with SigridActions {
     } } } ~
     path("sigrid") { get {
         log(s"request: /sigrid")
+        db.purgeRemovableRooms()
         reply(ui.studentStartPage()) 
     } } ~
     path("sigrid" / "login") { get { 

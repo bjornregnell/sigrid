@@ -10,7 +10,7 @@ trait SigridActions {
 
   def supervisorLogin(name: String, course: String, room: String, state: String): StandardRoute = {
     log(s"request: /beppe/login?name=$name&course=$course&room=$room&state=$state")
-    
+
     val u = db.addUser(name)
     log(s"added $u to userNamesToMap=${db.userNamesToMap}")
     
@@ -103,6 +103,7 @@ trait SigridActions {
 
   def studentUpdate(u: String, c: String, r: String, s: String): StandardRoute = {
     log(s"request: /sigrid/room?userid=$u&course=$c&room=$r&state=$s")
+
     errorMessageIfMissing(u: String, c: String, r: String, s: String,
                           ui.validStudentState)
       .map(errMsg => reply(ui.studentStartPage(errMsg)))
