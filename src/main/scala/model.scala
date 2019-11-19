@@ -44,6 +44,9 @@ object RoomKey {
     new RoomKey(validCourse(course), validRoomName(roomName))
 }
 
+object Room {
+  val HoursUntilExpired = 3
+}
 case class Room(
   course: String, 
   name: String, 
@@ -80,10 +83,11 @@ case class Room(
 
   def clearApprovalQueue(): Room = copy(approvalQueue = Vector())
 
-  def isExpired: Boolean = {
-    val h = created.hour
-    ???
-  }
+  def isExpired: Boolean = created < Date.now.minusHours(Room.HoursUntilExpired)
+
+  def isActive: Boolean = supervisor.isDefined || students.nonEmpty
+
+  def isRemovable: Boolean = isExpired || !isActive
 
   override def toString = 
     s"Room($course, $name, supervisor=$supervisor, students=$students), helpQueue=$helpQueue, approvalQueue=$approvalQueue, created=${created})"
