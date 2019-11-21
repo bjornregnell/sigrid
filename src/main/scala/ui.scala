@@ -41,6 +41,7 @@ object ui {
   def sigridHeader(heading: String): String = s"""
     ${html.h1(s"* $heading *")}
     <p> ${html.link("https://github.com/bjornregnell/sigrid/", "Sigrid")} är en hjälpköwebbapp @ ${Date.now.show} </p>
+    <p> Karta över ${html.link("https://fileadmin.cs.lth.se/cs/Bilder/Salar/Datorsalar_E-huset.pdf", "E-husets datorrum")} </p>
   """
 
   def studentStartPage(msg: String = "Hej student!"): String = 
