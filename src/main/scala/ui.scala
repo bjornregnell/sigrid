@@ -65,6 +65,15 @@ object ui {
        |   $showRawDatabase
        |""".stripMargin
     ) 
+  
+  def monitorPage(): String = 
+    html.page(
+      title = "SIGRID MONITOR", 
+      body = s"""
+      |   ${sigridHeader("SIGRID MONITOR")}
+      |   ${showAllRooms(course = None, exceptRoom = None, isShortVersion = false)}
+      |""".stripMargin
+    ) 
 
   def showQueueLength(qname: String, n: Int): String = s"""
     ${html.boldIf(n > 0)(qname)}: $n
@@ -82,7 +91,7 @@ object ui {
     val r = db.roomsToMap(RoomKey(course, roomName))
     val n = r.students.size
     s"""
-    <p>    &nbsp; 
+    <p>  $course  &nbsp; 
       <b>${r.name}:</b> $n student${if (n != 1) "er" else ""}, 
       handledare ${r.supervisor.map(_.id).getOrElse("<b>SAKNAS</b>")} </br>
 
@@ -92,18 +101,19 @@ object ui {
 
       &nbsp;&nbsp; <i>redovkö:</i> 
       ${r.approvalQueue.length} 
-      ${r.approvalQueue.mkString(",")} </br>
+      ${r.approvalQueue.mkString(",")}
     </p>
     """
   }
 
-  def showAllRooms(exceptRoom: Option[String] = None, course: Option[String] = None): String = {
-    val delim = "</br>\n"
+  def showAllRooms(exceptRoom: Option[String] = None, course: Option[String] = None, isShortVersion: Boolean = false): String = {
+    val delim = "\n"
     def roomFilter(r: Room): Boolean = exceptRoom.map(_ != r.name).getOrElse(true) 
     def courseFilter(r: Room): Boolean = course.map(_ == r.course).getOrElse(true) 
     val table = db.rooms
       .filter(r => roomFilter(r) && courseFilter(r))
-      .map(r => showRoomShort(r, course.isEmpty))
+      .sortBy(r => r.course + r.name)
+      .map(r => if (isShortVersion) showRoomShort(r, course.isEmpty) else showRoomLong(r.name, r.course))
       .mkString(delim)
     val heading = 
       if (table.nonEmpty) 

@@ -32,6 +32,11 @@ object SigridServer extends WebServer with SigridActions {
         db.purgeRemovableRooms()
         reply(ui.studentStartPage()) 
     } } ~
+    path("sigrid" / "monitor") { get {
+      log(s"request: /sigrid/monitor")
+      db.purgeRemovableRooms()
+      reply(ui.monitorPage()) 
+    } } ~
     path("sigrid" / "login") { get { 
       parameters("name", "course", "room", "state") { (n, c, r, s) =>
         studentLogin(vn(n), vc(c), vr(r), vs(s))
