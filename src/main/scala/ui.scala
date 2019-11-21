@@ -1,4 +1,5 @@
 object ui {
+  val MonitorReloadEverySeconds = 1
 
   val validStudentState = Set("work", "help", "ready", "exit")
   
@@ -34,15 +35,15 @@ object ui {
   |    <input type="hidden" name="state" value="$state">
   |
   |    <button class="button">Enter</button> 
-  |    ${html.link("sigrid/monitor", "SIGRID MONITOR")} 
+  |    ${html.link("http://cs.lth.se/sigrid/monitor", "SIGRID MONITOR")} 
   |  </div>
   |</form>
   |""".stripMargin
 
   def sigridHeader(heading: String): String = s"""
     ${html.h1(s"* $heading *")}
-    <p> ${html.link("https://github.com/bjornregnell/sigrid/", "Sigrid")} är en hjälpköwebbapp @ ${Date.now.show} </p>
-    <p> Karta över ${html.link("https://fileadmin.cs.lth.se/cs/Bilder/Salar/Datorsalar_E-huset.pdf", "E-husets datorrum")}. </p>
+    <p> ${html.link("http://cs.lth.se/sigrid", "Sigrid")} är en hjälpköwebbapp @ ${Date.now.show} </p>
+    <p> Karta över ${html.link("https://fileadmin.cs.lth.se/cs/Bilder/Salar/Datorsalar_E-huset.pdf", "E-husets datorrum")}. Kolla ${html.link("https://github.com/bjornregnell/sigrid/", "koden")}.</p>
   """
 
   def studentStartPage(msg: String = "Hej student!"): String = 
@@ -72,8 +73,10 @@ object ui {
       title = "SIGRID MONITOR", 
       body = s"""
       |   ${sigridHeader("SIGRID MONITOR")}
+      |   ${if (db.rooms.isEmpty) "INGA AKTIVA RUM" else ""}
       |   ${showAllRooms(course = None, exceptRoom = None, isShortVersion = false)}
-      |""".stripMargin
+      |""".stripMargin,
+      reloadEverySeconds = MonitorReloadEverySeconds
     ) 
 
   def showQueueLength(qname: String, n: Int): String = s"""
@@ -107,7 +110,7 @@ object ui {
     """
   }
 
-  def showAllRooms(exceptRoom: Option[String] = None, course: Option[String] = None, isShortVersion: Boolean = false): String = {
+  def showAllRooms(exceptRoom: Option[String] = None, course: Option[String] = None, isShortVersion: Boolean = true): String = {
     val delim = "\n"
     def roomFilter(r: Room): Boolean = exceptRoom.map(_ != r.name).getOrElse(true) 
     def courseFilter(r: Room): Boolean = course.map(_ == r.course).getOrElse(true) 

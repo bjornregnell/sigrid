@@ -33,7 +33,7 @@ object SigridServer extends WebServer with SigridActions {
         reply(ui.studentStartPage()) 
     } } ~
     path("sigrid" / "monitor") { get {
-      log(s"request: /sigrid/monitor")
+      print(".")
       db.purgeRemovableRooms()
       reply(ui.monitorPage()) 
     } } ~

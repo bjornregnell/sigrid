@@ -1,3 +1,4 @@
+import akka.http.scaladsl.model.headers.LinkParams.rel
 object html {
     val styles = """
     |html { -webkit-font-smoothing: antialiased; }
@@ -59,8 +60,11 @@ object html {
     |#}
     */
 
-  def page(body: String, title: String): String = s"""<!DOCTYPE html>
-    |<html><head><meta charset="UTF-8"><title>$title</title>
+  def page(body: String, title: String, reloadEverySeconds: Int = 0): String = s"""<!DOCTYPE html>
+    |<html><head><meta charset="UTF-8">
+    |
+    |${if (reloadEverySeconds > 0) s"""<meta http-equiv="refresh" content="$reloadEverySeconds" />""" else ""}
+    |<title>$title</title>
     |<style>
     |$styles
     |</style>
