@@ -1,4 +1,3 @@
-import akka.http.scaladsl.model.headers.LinkParams.rel
 object html {
     val styles = """
     |html { -webkit-font-smoothing: antialiased; }
