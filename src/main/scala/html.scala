@@ -54,11 +54,6 @@ object html {
     }
     """.stripMargin
 
-    /*     |#input[type='radio'] { 
-    |#transform: scale(4, 2); 
-    |#}
-    */
-
   def page(body: String, title: String, reloadEverySeconds: Int = 0): String = s"""<!DOCTYPE html>
     |<html><head><meta charset="UTF-8">
     |
