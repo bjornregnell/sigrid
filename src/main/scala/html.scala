@@ -40,6 +40,7 @@ object html {
     .radio-toolbar label {
       display: inline-block;
       background-color:  #ddd;
+      font-weight:300;
       padding: 10px 20px;
       font-size: 32px;
       border: 8px solid #444;
@@ -47,7 +48,8 @@ object html {
     }
     .radio-toolbar input[type="radio"]:checked + label {
       background-color: #fcba03;
-      border-color: #4c4;
+      font-weight:900;
+      border-color: #c700d1;
     }
     .radio-toolbar input[type="radio"]:focus + label {
       border: 8px dashed #444;

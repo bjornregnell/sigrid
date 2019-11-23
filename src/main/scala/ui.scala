@@ -34,7 +34,7 @@ object ui {
   |
   |    <input type="hidden" name="state" value="$state">
   |
-  |    <button class="button">Enter</button> 
+  |    <button class="button">Logga in</button> 
   |    ${html.link("http://cs.lth.se/sigrid/monitor", "SIGRID MONITOR")} 
   |  </div>
   |</form>
@@ -142,20 +142,20 @@ object ui {
       |  <div class="radio-toolbar">
       |
       |  <p><input type="radio" id="radioWork" name="state" value="work"  ${check("work")}>  
-      |  <label for="radioWork"><b>Jobba på!</b></label>&nbsp; Stå inte i någon kö.</p>
+      |  <label for="radioWork">Köar inte</label>&nbsp; Jobbar eller får hjälp.</p>
       |
       |  <p><input type="radio" id="radioHelp" name="state" value="help"  ${check("help")}> 
-      |  <label for="radioHelp"><b>Hjäälp!!!</b></label>&nbsp; Ställ mig i hjälpkön.</p>
+      |  <label for="radioHelp">Hjäälp!!!</label>&nbsp; Står i hjälpkön.</p>
       |
       |  <p><input type="radio" id="radioReady" name="state" value="ready" ${check("ready")}> 
-      |  <label for="radioReady"><b>Fäärdiig!</b></label>&nbsp; Ställ mig i redovisningskön. </p> 
+      |  <label for="radioReady">Fäärdiig!</label>&nbsp; Står i redovisningskön. </p> 
       | 
       |  <p><input type="radio" id="radioExit" name="state" value="exit"  ${check("exit")}> 
-      |  <label for="radioExit"><b>TackÅHej!</b></label>&nbsp; Lämna rummet. </p> 
+      |  <label for="radioExit">Loggar ut</label>&nbsp; Redovisar, lämnar rummet. </p> 
       | 
       |</div>
-      |   <p>Glöm ej <i>Jobba på! + Uppdatera</i> när du fått hjälp.</br>
-      |      Glöm ej <i>TackÅHej! + Uppdatera</i> när du är klar.</p>
+      |   <p>Glöm inte <i>Köar inte + Uppdatera</i> medan du får hjälp.</br>
+      |      Glöm inte <i>Loggar ut + Uppdatera</i> medan du redovisar.</p>
       |
       |    <button class="button">Uppdatera</button>
       |</div>
