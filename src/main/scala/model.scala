@@ -37,7 +37,7 @@ object RoomKey {
     else DefaultCourse
   
   def validRoomName(s: String): String = 
-    if (s.nonEmpty) s.filter(c => c.isLetter).take(MaxRoomLength).toLowerCase.capitalize 
+    if (s.nonEmpty) s.filter(c => c.isLetterOrDigit).take(MaxRoomLength).toLowerCase.capitalize 
     else DefaultRoom
   
   def apply(course: String, roomName: String): RoomKey = 
