@@ -57,13 +57,13 @@ case class Room(
   created: Date = Date.now,
 ){
   def wantHelp(u: User): Room = copy(
-    helpQueue = helpQueue.filterNot(_ == u) :+ u,
+    helpQueue = if (helpQueue.contains(u)) helpQueue else helpQueue :+ u,
     approvalQueue = approvalQueue.filterNot(_ == u)
   )
 
   def wantApproval(u: User): Room = copy(
     helpQueue = helpQueue.filterNot(_ == u),
-    approvalQueue = approvalQueue.filterNot(_ == u) :+ u
+    approvalQueue = if (approvalQueue.contains(u)) approvalQueue else approvalQueue :+ u
   )
 
   def working(u: User): Room = copy(
