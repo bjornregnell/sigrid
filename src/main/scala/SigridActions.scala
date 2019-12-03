@@ -11,7 +11,11 @@ trait SigridActions {
   def supervisorLogin(name: String, course: String, room: String, state: String): StandardRoute = {
     log(s"request: /beppe/login?name=$name&course=$course&room=$room&state=$state")
 
-    db.purgeRemovableRooms()
+    val nPurgedRooms = db.purgeRemovableRooms()
+    if (nPurgedRooms > 0) log(s"purged $nPurgedRooms removable rooms")
+
+    val nPurgedUsers = db.purgeRemovableUsers()
+    if (nPurgedUsers > 0) log(s"purged $nPurgedUsers removable users")
 
     val u = db.addUser(name)
     log(s"added $u to userNamesToMap=${db.userNamesToMap}")
@@ -35,7 +39,11 @@ trait SigridActions {
   def studentLogin(name: String, course: String, room: String, state: String): StandardRoute = {
     log(s"request: /sigrid/login?name=$name&course=$course&room=$room&state=$state")
 
-    db.purgeRemovableRooms()
+    val nPurgedRooms = db.purgeRemovableRooms()
+    if (nPurgedRooms > 0) log(s"purged $nPurgedRooms removable rooms")
+
+    val nPurgedUsers = db.purgeRemovableUsers()
+    if (nPurgedUsers > 0) log(s"purged $nPurgedUsers removable users")
 
     val u = db.addUser(name)
     log(s"added $u to userNamesToMap=${db.userNamesToMap}")
