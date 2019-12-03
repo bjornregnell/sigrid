@@ -142,13 +142,24 @@ object db {
     roomStore.update(k){ rOpt => rOpt.map(_.goodbye(u)) }
   }
 
-  def clearHelpQueue(course: String, roomName: String): Option[Room] = {
+  def popHelpQueue(course: String, roomName: String): Option[Room] = {
     val k = RoomKey(course, roomName)
     roomStore.update(k){ rOpt => rOpt.map(_.clearHelpQueue()) }
+  }
+
+  def popApprovalQueue(course: String, roomName: String): Option[Room] = {
+    val k = RoomKey(course, roomName)
+    roomStore.update(k){ rOpt => rOpt.map(_.popApprovalQueue()) }
+  }
+
+  def clearHelpQueue(course: String, roomName: String): Option[Room] = {
+    val k = RoomKey(course, roomName)
+    roomStore.update(k){ rOpt => rOpt.map(_.popHelpQueue()) }
   }
 
   def clearApprovalQueue(course: String, roomName: String): Option[Room] = {
     val k = RoomKey(course, roomName)
     roomStore.update(k){ rOpt => rOpt.map(_.clearApprovalQueue()) }
   }
+
 }

@@ -66,6 +66,20 @@ trait SigridActions {
             log(s"supervising $u")
             reply(ui.supervisorUpdatePage(u, c, r, s)) 
 
+          case "pophelp" => 
+            log(s"pophelp chosen by supervisor $u")
+            val rOpt = db.popHelpQueue(c,r)
+            val err: String = if (rOpt.isEmpty) s"Error: $u" else u
+            log(s"$err cleared help queue in $rOpt")
+            reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
+
+          case "popready" => 
+            log(s"popready chosen by supervisor $u")
+            val rOpt = db.popApprovalQueue(c,r)
+            val err: String = if (rOpt.isEmpty) s"Error: $u" else u
+            log(s"$err cleared ready queue in $rOpt")
+            reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
+
           case "clearhelp" => 
             log(s"clearhelp chosen by supervisor $u")
             val rOpt = db.clearHelpQueue(c,r)

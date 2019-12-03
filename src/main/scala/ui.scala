@@ -1,9 +1,9 @@
 object ui {
-  val MonitorReloadEverySeconds = 1
+  val MonitorReloadEverySeconds = 5
 
   val validStudentState = Set("work", "help", "ready", "exit")
   
-  val validSupervisorState = Set("supervising", "clearhelp", "clearready", "gone", "purge")
+  val validSupervisorState = Set("supervising", "pophelp", "popready", "clearhelp", "clearready", "gone", "purge")
  
   def showRawDatabase: String = s"""
     <p></br>----- raw database toStrings for debugging purposes -----</br> 
@@ -185,21 +185,27 @@ object ui {
       |  <p><input type="radio" id="radioSup" name="state" value="supervising" ${check("supervising")}>
       |  <label for="radioSup"><b>Jubba!</b></label> &nbsp; Handledare handleder.</p>
       |
+      |  <p><input type="radio" id="radioPopHelp" name="state" value="pophelp" ${check("pophelp")}>
+      |  <label for="radioPopHelp"><b>Pop hjälpkö</b></label> &nbsp; Ta bort första student ur hjälpkön.</p>
+      |
+      |  <p><input type="radio" id="radioPopReady" name="state" value="popready" ${check("popready")}>
+      |  <label for="radioPopReady"><b>Pop redovkö</b></label> &nbsp; Ta bort första student ur redovkön.</p>
+      | 
       |  <p><input type="radio" id="radioClearHelp" name="state" value="clearhelp" ${check("clearhelp")}>
-      |  <label for="radioClearHelp"><b>Töm hjälpkö!</b></label> &nbsp; Töm hjälpkön.</p>
+      |  <label for="radioClearHelp"><b>Töm hjälpkö</b></label> &nbsp; Töm hjälpkön.</p>
       |
       |  <p><input type="radio" id="radioClearReady" name="state" value="clearready" ${check("clearready")}>
-      |  <label for="radioClearReady"><b>Töm redovkö!</b></label> &nbsp; Töm redovisningskön.</p>
+      |  <label for="radioClearReady"><b>Töm redovkö</b></label> &nbsp; Töm redovisningskön.</p>
       | 
       |  <p><input type="radio" id="radioGone" name="state" value="gone"  ${check("gone")}> 
-      |  <label for="radioGone"><b>Hejdå!</b></label> &nbsp; Handledare lämnar,  rummet finns kvar.</p> 
+      |  <label for="radioGone"><b>Hejdå</b></label> &nbsp; Handledare lämnar,  rummet finns kvar.</p> 
       |  
       |  <p><input type="radio" id="radioPurge" name="state" value="purge"  ${check("purge")}> 
-      |  <label for="radioPurge"><b>Radera!</b></label> &nbsp; Radera rummet och dess köer.</p> 
+      |  <label for="radioPurge"><b>Radera</b></label> &nbsp; Radera rummet och dess köer.</p> 
       |
-      |   <p>Glöm ej <i>Radera! + Uppdatera</i> när undervisningen är klar.</p>
+      |  <p>Glöm ej <i>Radera + Uppdatera</i> när undervisningen är klar.</p>
       |
-      |   <button class="button">Uppdatera</button>
+      |  <button class="button">Uppdatera</button>
       |  </div>
       |</form>
       |<p> ${course} ${Date.now.show} </p>

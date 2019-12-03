@@ -83,6 +83,10 @@ case class Room(
 
   def clearApprovalQueue(): Room = copy(approvalQueue = Vector())
 
+  def popHelpQueue(): Room = copy(helpQueue = helpQueue.drop(1))
+
+  def popApprovalQueue(): Room = copy(approvalQueue = approvalQueue.drop(1))
+
   def isExpired: Boolean = created < Date.now.minusHours(Room.HoursUntilExpired)
 
   def isActive: Boolean = supervisor.isDefined || students.nonEmpty
