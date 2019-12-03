@@ -11,6 +11,8 @@ trait SigridActions {
   def supervisorLogin(name: String, course: String, room: String, state: String): StandardRoute = {
     log(s"request: /beppe/login?name=$name&course=$course&room=$room&state=$state")
 
+    db.purgeRemovableRooms()
+
     val u = db.addUser(name)
     log(s"added $u to userNamesToMap=${db.userNamesToMap}")
     
@@ -18,7 +20,7 @@ trait SigridActions {
     log(s"room added: $rOpt")
     
     val rOpt2 = 
-      db.addSupervisorIfNonEmptyRoomAndSupervisorMissing(u,course,roomName = room)
+      db.addSupervisorIfNonEmptyRoomAndSupervisorMissing(u, course, roomName = room)
     val sup: Option[User] = rOpt2.flatMap(_.supervisor)
     if (sup == Some(u)) {
       log(s"supervisor $u added to room: $rOpt")
@@ -32,7 +34,9 @@ trait SigridActions {
 
   def studentLogin(name: String, course: String, room: String, state: String): StandardRoute = {
     log(s"request: /sigrid/login?name=$name&course=$course&room=$room&state=$state")
-    
+
+    db.purgeRemovableRooms()
+
     val u = db.addUser(name)
     log(s"added $u to userNamesToMap=${db.userNamesToMap}")
     
