@@ -48,7 +48,8 @@ object db {
     var found = false
     val it = roomStore.values.iterator
     while (!found && it.hasNext) {
-      if (it.next.students.contains(u)) found = true      
+      val r = it.next
+      if (r.students.contains(u) || r.supervisor.contains(u)) found = true      
     }
     found
   }
@@ -74,6 +75,14 @@ object db {
     }
     n
  }
+
+  def purgeRemovableUsers(): Int = {    // TODO test this
+    var n = 0
+    users.foreach { u => 
+      if (isUserInSomeRoom(u) && removeUser(u)) n += 1        
+    }
+    n
+  }
 
   /** Remove room if existing, returns deleted room or None if non-existing.*/
   def removeRoom(course: String, roomName: String): Option[Room] = {
