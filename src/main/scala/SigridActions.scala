@@ -82,14 +82,14 @@ trait SigridActions {
             log(s"pophelp chosen by supervisor $u")
             val rOpt = db.popHelpQueue(c,r)
             val err: String = if (rOpt.isEmpty) s"Error: $u" else u
-            log(s"$err cleared help queue in $rOpt")
+            log(s"$err pop help queue in $rOpt")
             reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
 
           case "popready" => 
             log(s"popready chosen by supervisor $u")
             val rOpt = db.popApprovalQueue(c,r)
             val err: String = if (rOpt.isEmpty) s"Error: $u" else u
-            log(s"$err cleared ready queue in $rOpt")
+            log(s"$err pop ready queue in $rOpt")
             reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
 
           case "clearhelp" => 
@@ -109,7 +109,7 @@ trait SigridActions {
           case "gone" => 
             log(s"gone supervisor $u")
             val uOpt = User.fromUserId(u)
-            val okOpt = uOpt.map(db.removeUser)
+            val okOpt = uOpt.map(db.removeUserIfNotInAnyRoom)
             if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
             reply(ui.supervisorStartPage(s"Handledare $u har sagt hejdå."))
 
@@ -117,6 +117,11 @@ trait SigridActions {
             log(s"purge supervisor $u room $c $r ")
             val rOpt = db.removeRoom(c, r)
             val err: String = if (rOpt.isEmpty) s"Error: $u" else u
+
+            val uOpt = User.fromUserId(u)
+            val okOpt = uOpt.map(db.removeUserIfNotInAnyRoom)
+            if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
+
             log(s"$err removed room $c $rOpt")
             reply(ui.supervisorStartPage(s"Rummet raderades av $u")) 
 

@@ -70,14 +70,7 @@ object db {
     found
   }
 
-  def removeAllUsers(): Int = {  // TODO: this is not threadsafe; should use updateAll on users
-    users.foreach(u => roomStore.updateAll((key,room) => room.goodbye(u)))
-    val n = userStore.size
-    userStore.clear()
-    n
-  }
-
-  def purgeRemovableRooms(): Int = {  // TODO: this is not threadsafe; should use updateAll on roomStore
+  def purgeRemovableRooms(): Int = {  // TODO: is this threadsafe???
     var n = 0
     roomKeys.foreach { rk =>
       roomStore.update(rk){ rOpt => 
@@ -92,19 +85,17 @@ object db {
     n
  }
 
-  def purgeRemovableUsers(): Int = {    // TODO: this is not threadsafe; should use updateAll on users
+  def purgeRemovableUsers(): Int = {    
     var n = 0
     users.foreach { u => 
-      if (!isUserInSomeRoom(u)) {  
-        removeUser(u) 
-        n += 1
-      }        
+        if (removeUserIfNotInAnyRoom(u))  n += 1
     }
     n
   }
 
+
   /** Remove room if existing, returns deleted room or None if non-existing.*/
-  def removeRoom(course: String, roomName: String): Option[Room] = {
+  def removeRoom(course: String, roomName: String): Option[Room] = {  
     val rk = RoomKey(course, roomName)
     val rDel = roomStore.get(rk) 
     val usersToMaybeRemove = scala.collection.mutable.ListBuffer.empty[User]
@@ -112,7 +103,7 @@ object db {
       rOpt.foreach(_.students.foreach(u => usersToMaybeRemove += u))
       None 
     }
-    usersToMaybeRemove.foreach(u => if (!isUserInSomeRoom(u)) removeUser(u))
+    usersToMaybeRemove.foreach(removeUserIfNotInAnyRoom)
     rDel
   }
 
@@ -172,7 +163,7 @@ object db {
 
   def popHelpQueue(course: String, roomName: String): Option[Room] = {
     val k = RoomKey(course, roomName)
-    roomStore.update(k){ rOpt => rOpt.map(_.clearHelpQueue()) }
+    roomStore.update(k){ rOpt => rOpt.map(_.popHelpQueue()) }
   }
 
   def popApprovalQueue(course: String, roomName: String): Option[Room] = {
@@ -182,7 +173,7 @@ object db {
 
   def clearHelpQueue(course: String, roomName: String): Option[Room] = {
     val k = RoomKey(course, roomName)
-    roomStore.update(k){ rOpt => rOpt.map(_.popHelpQueue()) }
+    roomStore.update(k){ rOpt => rOpt.map(_.clearHelpQueue()) }
   }
 
   def clearApprovalQueue(course: String, roomName: String): Option[Room] = {
