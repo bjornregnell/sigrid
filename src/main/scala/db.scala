@@ -44,6 +44,22 @@ object db {
     existed
   }
 
+  def removeUserIfNotInAnyRoom(u: User): Boolean = {
+    var wasRemoved = false
+    userStore.update(u.name){ xsOpt => 
+      val n = u.number
+      val existed = xsOpt.map(_.contains(n)).getOrElse(false)
+      if (!isUserInSomeRoom(u)) {
+        roomStore.updateAll((key,room) => room.goodbye(u))
+        val removed = xsOpt.map(xs => xs.filterNot(_ == n))
+        wasRemoved = existed
+        if (removed == Option(Vector[Int]())) None else removed
+      } else xsOpt
+    }
+    wasRemoved
+  }
+
+
   def isUserInSomeRoom(u: User): Boolean = {
     var found = false
     val it = roomStore.values.iterator
@@ -54,14 +70,14 @@ object db {
     found
   }
 
-  def removeAllUsers(): Int = {
+  def removeAllUsers(): Int = {  // TODO: this is not threadsafe; should use updateAll on users
     users.foreach(u => roomStore.updateAll((key,room) => room.goodbye(u)))
     val n = userStore.size
     userStore.clear()
     n
   }
 
-  def purgeRemovableRooms(): Int = {  // TODO test this
+  def purgeRemovableRooms(): Int = {  // TODO: this is not threadsafe; should use updateAll on roomStore
     var n = 0
     roomKeys.foreach { rk =>
       roomStore.update(rk){ rOpt => 
@@ -76,10 +92,10 @@ object db {
     n
  }
 
-  def purgeRemovableUsers(): Int = {    // TODO test this
+  def purgeRemovableUsers(): Int = {    // TODO: this is not threadsafe; should use updateAll on users
     var n = 0
     users.foreach { u => 
-      if (!isUserInSomeRoom(u)) {
+      if (!isUserInSomeRoom(u)) {  
         removeUser(u) 
         n += 1
       }        
