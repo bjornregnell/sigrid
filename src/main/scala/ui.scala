@@ -113,7 +113,7 @@ object ui {
   }
 
   def showAllRooms(exceptRoom: Option[String] = None, course: Option[String] = None, isShortVersion: Boolean = true): String = {
-    val delim = "\n"
+    val delim = "<br>\n"
     def roomFilter(r: Room): Boolean = exceptRoom.map(_ != r.name).getOrElse(true) 
     def courseFilter(r: Room): Boolean = course.map(_ == r.course).getOrElse(true) 
     val table = db.rooms
