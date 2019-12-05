@@ -37,10 +37,10 @@ object db {
     userStore.update(u.name){ xsOpt => 
       val n = u.number
       existed = xsOpt.map(_.contains(n)).getOrElse(false)
+      roomStore.updateAll((key,room) => room.goodbye(u))
       val removed = xsOpt.map(xs => xs.filterNot(_ == n)) 
       if (removed == Option(Vector[Int]())) None else removed
     }
-    roomStore.updateAll((key,room) => room.goodbye(u))
     existed
   }
 
@@ -79,7 +79,10 @@ object db {
   def purgeRemovableUsers(): Int = {    // TODO test this
     var n = 0
     users.foreach { u => 
-      if (isUserInSomeRoom(u) && removeUser(u)) n += 1        
+      if (!isUserInSomeRoom(u)) {
+        removeUser(u) 
+        n += 1
+      }        
     }
     n
   }
