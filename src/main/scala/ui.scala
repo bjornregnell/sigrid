@@ -6,10 +6,10 @@ object ui {
   val validSupervisorState = Set("supervising", "pophelp", "popready", "clearhelp", "clearready", "gone", "purge")
  
   def showRawDatabase: String = s"""
-    <p></br>----- raw database toStrings for debugging purposes -----</br> 
-      users: ${db.users.size} ${db.users} </br>
-      </br>
-      rooms: ${db.roomsToMap.size} ${db.roomsToMap} </br>
+    <p><br>----- raw database toStrings for debugging purposes -----<br> 
+      users: ${db.users.size} ${db.users} <br>
+      <br>
+      rooms: ${db.roomsToMap.size} ${db.roomsToMap} <br>
     </p>
     """
 
@@ -20,17 +20,17 @@ object ui {
   |    <label for="name">   <b>Förnamn:</b> </label>
   |    <input name="name" id="name" value="" class="smallinput" required>
   |    Exempel: kim
-  |    </br>
+  |    <br>
   |
   |    <label for="kurskod"><b>Kurskod:</b> </label>
   |    <input name="course" id="course" value="" class="smallinput" required>
   |    Exempel: EDAA45
-  |    </br>
+  |    <br>
   |
   |    <label for="rum">  &nbsp;&nbsp;&nbsp;  <b>Rum:</b> </label>  
   |    <input name="room" id="room" value="" class="smallinput"  required>
   |    Exempel: Hacke 
-  |    </br>
+  |    <br>
   |
   |    <input type="hidden" name="state" value="$state">
   |
@@ -75,6 +75,8 @@ object ui {
       |   ${sigridHeader("SIGRID MONITOR")}
       |   ${if (db.rooms.isEmpty) "INGA AKTIVA RUM" else ""}
       |   ${showAllRooms(course = None, exceptRoom = None, isShortVersion = false)}
+      |
+      |$showRawDatabase
       |""".stripMargin,
       reloadEverySeconds = MonitorReloadEverySeconds
     ) 
@@ -97,11 +99,11 @@ object ui {
     s"""
     <p>  $course  &nbsp; 
       <b>${r.name}:</b> $n student${if (n != 1) "er" else ""}, 
-      handledare ${r.supervisor.map(_.id).getOrElse("<b>SAKNAS</b>")} </br>
+      handledare ${r.supervisor.map(_.id).getOrElse("<b>SAKNAS</b>")} <br>
 
       &nbsp;&nbsp; <i>hjälpkö:</i> 
       ${r.helpQueue.length} 
-      ${r.helpQueue.mkString(",")} </br>
+      ${r.helpQueue.mkString(",")} <br>
 
       &nbsp;&nbsp; <i>redovkö:</i> 
       ${r.approvalQueue.length} 
@@ -121,7 +123,7 @@ object ui {
       .mkString(delim)
     val heading = 
       if (table.nonEmpty) 
-        s"""&nbsp;${if (exceptRoom.nonEmpty) "Övriga" else "Aktiva"} rum:</br>"""
+        s"""&nbsp;${if (exceptRoom.nonEmpty) "Övriga" else "Aktiva"} rum:<br>"""
       else ""
     s"$heading \n $table"
   }
@@ -154,7 +156,7 @@ object ui {
       |  <label for="radioExit">Loggar ut</label>&nbsp; Redovisar, lämnar rummet. </p> 
       | 
       |</div>
-      |   <p>Glöm inte <i>Köar inte + Uppdatera</i> medan du får hjälp.</br>
+      |   <p>Glöm inte <i>Köar inte + Uppdatera</i> medan du får hjälp.<br>
       |      Glöm inte <i>Loggar ut + Uppdatera</i> medan du redovisar.</p>
       |
       |    <button class="button">Uppdatera</button>
@@ -231,7 +233,7 @@ object ui {
   def helloPage: String = html.helloPage(
     s"""
     
-    Sigrid är ${html.link(sigridVideoLink, "fäärdiig!!!")} </br>
+    Sigrid är ${html.link(sigridVideoLink, "fäärdiig!!!")} <br>
 
     $sigridVideoEmbeddedLink
 

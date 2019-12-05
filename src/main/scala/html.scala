@@ -73,7 +73,7 @@ object html {
 
   def h1(heading: String): String = s"<h1>$heading</h1>"
 
-  def nl2br(soup: String): String = soup.replaceAllLiterally("\n"," </br>\n")    
+  def nl2br(soup: String): String = soup.replaceAllLiterally("\n"," <br>\n")    
 
   def helloPage(msg: String = "hello world!"): String = s"""|<!DOCTYPE html>
     |<html>
