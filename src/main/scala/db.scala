@@ -70,7 +70,7 @@ object db {
     found
   }
 
-  def purgeRemovableRooms(): Int = {  // TODO: is this threadsafe???
+  def purgeRemovableRooms(): Int = {  // TODO: investigate if this is thread safe ???
     var n = 0
     roomKeys.foreach { rk =>
       roomStore.update(rk){ rOpt => 
