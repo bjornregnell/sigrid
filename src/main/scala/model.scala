@@ -44,6 +44,11 @@ object RoomKey {
     new RoomKey(validCourse(course), validRoomName(roomName))
 }
 
+case class SessionBlock(start: Int, end: Int)
+object SessionBlock {
+  val sessionBlocks = Vector(SessionBlock(8, 10), SessionBlock(10, 12), SessionBlock(13, 15), SessionBlock(15, 17))
+}
+
 object Room {
   val HoursUntilExpired = 3
 }
@@ -87,7 +92,18 @@ case class Room(
 
   def popApprovalQueue(): Room = copy(approvalQueue = approvalQueue.drop(1))
 
-  def isExpired: Boolean = created < Date.now.minusHours(Room.HoursUntilExpired)
+  def isExpired(): Boolean = {
+    val expiredByMaximumTime = created < Date.now.minusHours(Room.HoursUntilExpired)
+    val sessionBlock = SessionBlock.sessionBlocks.find((block) => {
+      block.start >= created.hour && block.end <= created.hour
+    })
+    if(sessionBlock.isEmpty) {
+      expiredByMaximumTime
+    }
+    else {
+      expiredByMaximumTime || Date.now.hour >= sessionBlock.get.end
+    }
+  }
 
   def isActive: Boolean = supervisor.isDefined || students.nonEmpty
 
