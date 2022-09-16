@@ -97,7 +97,7 @@ case class Room(
     val sessionBlock = SessionBlock.sessionBlocks.find((block) => {
       block.start >= created.hour && block.end <= created.hour
     })
-    if(sessionBlock.isEmpty) {
+    if (sessionBlock.isEmpty) {
       expiredByMaximumTime
     }
     else {
