@@ -50,7 +50,7 @@ object Room {
 case class Room(
   course: String, 
   name: String, 
-  supervisor: Option[User] = None,
+  supervisors: Set[User] = Set(),
   students: Set[User] = Set(), 
   helpQueue: Vector[User] = Vector(), 
   approvalQueue: Vector[User] = Vector(), 
@@ -76,7 +76,7 @@ case class Room(
     students = students - u,
     helpQueue = helpQueue.filterNot(_ == u),
     approvalQueue = approvalQueue.filterNot(_ == u),
-    supervisor = supervisor.flatMap(s => if (s == u) None else Some(s))
+    supervisors = supervisors - u
   )
 
   def clearHelpQueue(): Room = copy(helpQueue = Vector())
@@ -89,10 +89,10 @@ case class Room(
 
   def isExpired: Boolean = created < Date.now().minusHours(Room.HoursUntilExpired)
 
-  def isActive: Boolean = supervisor.isDefined || students.nonEmpty
+  def isActive: Boolean = supervisors.nonEmpty || students.nonEmpty
 
   def isRemovable: Boolean = isExpired || !isActive
 
   override def toString = 
-    s"Room($course, $name, supervisor=$supervisor, students=$students), helpQueue=$helpQueue, approvalQueue=$approvalQueue, created=${created})"
+    s"Room($course, $name, supervisor=$supervisors, students=$students), helpQueue=$helpQueue, approvalQueue=$approvalQueue, created=${created})"
 }

@@ -65,7 +65,7 @@ object db {
     val it = roomStore.values.iterator
     while (!found && it.hasNext) {
       val r = it.next()
-      if (r.students.contains(u) || r.supervisor.contains(u)) found = true      
+      if (r.students.contains(u) || r.supervisors.contains(u)) found = true      
     }
     found
   }
@@ -107,37 +107,34 @@ object db {
     rDel
   }
 
-  def addRoomIfEmpty(
+  def addRoomIfNotExists(
     course: String, 
     roomName: String, 
-    supervisor: Option[User]
   ): Option[Room] = {
     val rk = RoomKey(course, roomName)
     roomStore.update(rk){ rOpt =>
-      if (rOpt.isEmpty) Option(Room(rk.course, rk.roomName, supervisor)) 
+      if (rOpt.isEmpty) Option(Room(course = rk.course, name = rk.roomName)) 
       else rOpt
     }
   }
 
-  def addStudentToRoomIfNonEmpty(
+  def addStudentIfRoomExists(
     student: User, 
     course: String, 
     roomName: String
   ): Option[Room] = {
     roomStore.update(RoomKey(course, roomName)){ rOpt =>
-      if (rOpt.nonEmpty) rOpt.map(r => r.copy(students = r.students + student)) else rOpt
+      rOpt.map(r => r.copy(students = r.students + student)) 
     }
   } 
 
-  def addSupervisorIfNonEmptyRoomAndSupervisorMissing(
+  def addSupervisorIfRoomExists(
     supervisor: User, 
     course: String, 
     roomName: String
   ): Option[Room] = {
     roomStore.update(RoomKey(course, roomName)){ rOpt =>
-      if (rOpt.nonEmpty && rOpt.get.supervisor.isEmpty) 
-        rOpt.map(r => r.copy(supervisor = Some(supervisor))) 
-      else rOpt
+        rOpt.map(r => r.copy(supervisors = r.supervisors + supervisor)) 
     }
   } 
 

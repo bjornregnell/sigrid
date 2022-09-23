@@ -20,19 +20,20 @@ trait SigridActions {
     val u = db.addUser(name)
     log(s"added $u to userNamesToMap=${db.userNamesToMap}")
     
-    val rOpt = db.addRoomIfEmpty(course, room, supervisor = Some(u))
-    log(s"room added: $rOpt")
+    val rOpt = db.addRoomIfNotExists(course, room)
+    log(s"room before update: $rOpt")
     
-    val rOpt2 = 
-      db.addSupervisorIfNonEmptyRoomAndSupervisorMissing(u, course, roomName = room)
-    val sup: Option[User] = rOpt2.flatMap(_.supervisor)
-    if (sup == Some(u)) {
-      log(s"supervisor $u added to room: $rOpt")
+    val rOpt2: Option[Room] = 
+      db.addSupervisorIfRoomExists(u, course, roomName = room)
+
+    val sup: Set[User] = rOpt2.map(_.supervisors).getOrElse(Set())
+    if (sup.contains(u)) {
+      log(s"supervisor $u added to room: $rOpt2")
       reply(ui.supervisorUpdatePage(u.id, course, room, state))
     } else {
-      log(s"ERROR: room $rOpt already has supervisor, removing user $u")
+      log(s"ERROR: could not add $u to $rOpt2")
       db.removeUser(u)
-      reply(ui.supervisorStartPage(s"ERROR: Rummet har redan handledare: $sup"))
+      reply(ui.supervisorStartPage(s"ERROR: kunde inte lägga till: $sup (förmodligen en bugg)"))
     }
   }
 
@@ -48,10 +49,12 @@ trait SigridActions {
     val u = db.addUser(name)
     log(s"added $u to userNamesToMap=${db.userNamesToMap}")
     
-    val rOpt = db.addRoomIfEmpty(course, room, None)
-    log(s"room optionally added: $rOpt")
+    val rOpt = db.addRoomIfNotExists(course, room)
+    log(s"room before update: $rOpt")
     
-    val rOpt2 = db.addStudentToRoomIfNonEmpty(u, course, room)
+    val rOpt2 = db.addStudentIfRoomExists(u, course, room)
+    log(s"room after updated: $rOpt")
+
     reply(ui.studentUpdatePage(u.id, course, room, state))
   }
 
@@ -109,7 +112,10 @@ trait SigridActions {
           case "gone" => 
             log(s"gone supervisor $u")
             val uOpt = User.fromUserId(u)
-            val okOpt = uOpt.map(db.removeUserIfNotInAnyRoom)
+            val okOpt = uOpt.map{ u => 
+              val _ = db.goodbye(u, c, r)
+              db.removeUserIfNotInAnyRoom(u)
+            }
             if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
             reply(ui.supervisorStartPage(s"Handledare $u har sagt hejdå."))
 
@@ -119,7 +125,7 @@ trait SigridActions {
             val err: String = if (rOpt.isEmpty) s"Error: $u" else u
 
             val uOpt = User.fromUserId(u)
-            val okOpt = uOpt.map(db.removeUserIfNotInAnyRoom)
+            val okOpt = uOpt.map(u => db.removeUserIfNotInAnyRoom(u))
             if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
 
             log(s"$err removed room $c $rOpt")

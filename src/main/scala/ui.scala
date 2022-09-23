@@ -88,7 +88,7 @@ object ui {
   def showRoomShort(r: Room, isShowCourse: Boolean = false): String = s"""
     &nbsp; &nbsp;
     ${if (isShowCourse) r.course else ""} ${r.name}: ${r.students.size} studenter, 
-    handl ${r.supervisor.map(_.id).getOrElse("<b>SAKNAS</b>")}, 
+    handl ${r.supervisors.map(_.id)}, 
     ${showQueueLength("hjälp",r.helpQueue.length)},
     ${showQueueLength("redov", r.approvalQueue.length)}  
   """
@@ -99,7 +99,7 @@ object ui {
     s"""
     <p>  $course  &nbsp; 
       <b>${r.name}:</b> $n student${if (n != 1) "er" else ""}, 
-      handledare ${r.supervisor.map(_.id).getOrElse("<b>SAKNAS</b>")} <br>
+      handledare ${r.supervisors.map(_.id)} <br>
 
       &nbsp;&nbsp; <i>hjälpkö:</i> 
       ${r.helpQueue.length} 
@@ -203,7 +203,7 @@ object ui {
       |  <label for="radioGone"><b>Hejdå</b></label> &nbsp; Handledare lämnar,  rummet finns kvar.</p> 
       |  
       |  <p><input type="radio" id="radioPurge" name="state" value="purge"  ${check("purge")}> 
-      |  <label for="radioPurge"><b>Radera</b></label> &nbsp; Radera rummet och dess köer.</p> 
+      |  <label for="radioPurge"><b>Radera</b></label> &nbsp; Radera rummet och dess köer. VARNING! </p> 
       |
       |  <p>Glöm ej <i>Radera + Uppdatera</i> när undervisningen är klar.</p>
       |
