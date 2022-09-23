@@ -76,7 +76,9 @@ object ui {
       |   ${if (db.rooms.isEmpty) "INGA AKTIVA RUM" else ""}
       |   ${showAllRooms(course = None, exceptRoom = None, isShortVersion = false)}
       |
+      |Denna sida uppdateras med $MonitorReloadEverySeconds sekunders intervall.
       |$showRawDatabase
+      |
       |""".stripMargin,
       reloadEverySeconds = MonitorReloadEverySeconds
     ) 
