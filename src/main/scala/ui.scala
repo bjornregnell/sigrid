@@ -42,7 +42,7 @@ object ui {
 
   def sigridHeader(heading: String): String = s"""
     ${html.h1(s"* $heading *")}
-    <p> ${html.link("http://cs.lth.se/sigrid", "Sigrid")} är en hjälpköwebbapp @ ${Date.now.show} </p>
+    <p> ${html.link("http://cs.lth.se/sigrid", "Sigrid")} är en hjälpköwebbapp @ ${Date.now().show} </p>
     <p> Karta över ${html.link("https://fileadmin.cs.lth.se/cs/Bilder/Salar/Datorsalar_E-huset.pdf", "E-husets datorrum")}. Kolla ${html.link("https://github.com/bjornregnell/sigrid/", "koden")}.</p>
   """
 
@@ -162,7 +162,7 @@ object ui {
       |    <button class="button">Uppdatera</button>
       |</div>
       |</form>
-      |<p> ${course} ${Date.now.show} </p>
+      |<p> ${course} ${Date.now().show} </p>
       |${showRoomLong(roomName = room, course = course)}
       |${showAllRooms(course = Some(course), exceptRoom = Some(room))}
       |$showRawDatabase
@@ -210,7 +210,7 @@ object ui {
       |  <button class="button">Uppdatera</button>
       |  </div>
       |</form>
-      |<p> ${course} ${Date.now.show} </p>
+      |<p> ${course} ${Date.now().show} </p>
       |${showRoomLong(roomName = room, course = course)}
       |${showAllRooms(course = Some(course), exceptRoom = Some(room))}
       |$showRawDatabase

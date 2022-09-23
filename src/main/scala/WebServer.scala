@@ -47,10 +47,16 @@ trait WebServer {
     //https://stackoverflow.com/questions/43298909/akka-http-not-allowing-incoming-connections-from-remote-hosts-on-macos
   ): Unit = {
     implicit val system = ActorSystem("my-system")
-    implicit val materializer = ActorMaterializer()
+    
+    //implicit val materializer = ActorMaterializer() 
+    //  not needed since akka 2.6 https://stackoverflow.com/questions/58768399
+    
     implicit val executionContext = system.dispatcher
 
-    val bindingFuture = Http().bindAndHandle(routes, host, port)
+    val bindingFuture = Http().newServerAt(host, port).bind(routes)
+    // deprecated: .bindAndHandle(routes, host, port)
+    // see: https://doc.akka.io/docs/akka-http/current/migration-guide/migration-guide-10.2.x.html
+    
     println(startMsg(host, port))
     commandLoopUntilQuit()
 

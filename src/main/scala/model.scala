@@ -54,7 +54,7 @@ case class Room(
   students: Set[User] = Set(), 
   helpQueue: Vector[User] = Vector(), 
   approvalQueue: Vector[User] = Vector(), 
-  created: Date = Date.now,
+  created: Date = Date.now(),
 ){
   def wantHelp(u: User): Room = copy(
     helpQueue = if (helpQueue.contains(u)) helpQueue else helpQueue :+ u,
@@ -87,7 +87,7 @@ case class Room(
 
   def popApprovalQueue(): Room = copy(approvalQueue = approvalQueue.drop(1))
 
-  def isExpired: Boolean = created < Date.now.minusHours(Room.HoursUntilExpired)
+  def isExpired: Boolean = created < Date.now().minusHours(Room.HoursUntilExpired)
 
   def isActive: Boolean = supervisor.isDefined || students.nonEmpty
 

@@ -64,7 +64,7 @@ object db {
     var found = false
     val it = roomStore.values.iterator
     while (!found && it.hasNext) {
-      val r = it.next
+      val r = it.next()
       if (r.students.contains(u) || r.supervisor.contains(u)) found = true      
     }
     found

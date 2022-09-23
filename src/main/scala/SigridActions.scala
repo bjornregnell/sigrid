@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.StandardRoute
 trait SigridActions { 
   self: WebServer => // require this trait to be a WebServer mix-in
 
-  def log(msg: String): Unit = println(s"\nSIGRID @ ${Date.now.show}> $msg")
+  def log(msg: String): Unit = println(s"\nSIGRID @ ${Date.now().show}> $msg")
 
   def supervisorLogin(name: String, course: String, room: String, state: String): StandardRoute = {
     log(s"request: /beppe/login?name=$name&course=$course&room=$room&state=$state")
