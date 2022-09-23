@@ -34,6 +34,12 @@ object RoomKey {
   val      knownRooms = 
     "Pluto Neptunus Uranus Saturnus Jupiter Mars Venus Elg Elgkalv Hacke Panter Ravel Alfa Beta Gamma".split(" ").toSet
 
+  def roomWarning(room: String): String = 
+    if (RoomKey.knownRooms.contains(room)) "" 
+    else s"<p>VARNING: Rum $room okänt i E-huset. Felstavat?</p>" + 
+         s"<p>Kända rum: ${RoomKey.knownRooms.mkString(", ")}.</p>"
+
+
   def validCourse(s: String): String = 
     if (s.nonEmpty) s.filter(c => c.isLetterOrDigit).take(MaxCourseLength).toUpperCase 
     else DefaultCourse
