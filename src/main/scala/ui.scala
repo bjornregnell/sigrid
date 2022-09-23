@@ -23,7 +23,7 @@ object ui {
   |    <br>
   |
   |    <label for="kurskod"><b>Kurskod:</b> </label>
-  |    <input name="course" id="course" value="" class="smallinput" required>
+  |    <input name="course" id="course" value="EDAA45" class="smallinput" required>
   |    Exempel: EDAA45
   |    <br>
   |
