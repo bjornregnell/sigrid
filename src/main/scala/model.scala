@@ -29,8 +29,8 @@ case class RoomKey private (course: String, roomName: String){
 object RoomKey {
   val MaxCourseLength = 25
   val   MaxRoomLength = 20
-  val   DefaultCourse = "KURS01"
-  val     DefaultRoom = "Shäraton"
+  val   DefaultCourse = "EDAA45"
+  val     DefaultRoom = "Idét"
 
   def validCourse(s: String): String = 
     if (s.nonEmpty) s.filter(c => c.isLetterOrDigit).take(MaxCourseLength).toUpperCase 
