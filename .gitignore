@@ -10,3 +10,4 @@
 .bloop
 .metals
 **/metals.sbt
+.bsp
