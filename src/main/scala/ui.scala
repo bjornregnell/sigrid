@@ -199,10 +199,10 @@ object ui {
       |  <label for="radioPopReady"><b>Pop redovkö</b></label> &nbsp; Ta bort första student ur redovkön.</p>
       | 
       |  <p><input type="radio" id="radioClearHelp" name="state" value="clearhelp" ${check("clearhelp")}>
-      |  <label for="radioClearHelp"><b>Töm hjälpkö</b></label> &nbsp; Töm hjälpkön.</p>
+      |  <label for="radioClearHelp"><b>Töm hjälpkö</b></label> &nbsp; Töm hjälpkön. VARNING!</p>
       |
       |  <p><input type="radio" id="radioClearReady" name="state" value="clearready" ${check("clearready")}>
-      |  <label for="radioClearReady"><b>Töm redovkö</b></label> &nbsp; Töm redovisningskön.</p>
+      |  <label for="radioClearReady"><b>Töm redovkö</b></label> &nbsp; Töm redovisningskön. VARNING!</p>
       | 
       |  <p><input type="radio" id="radioRemoveStudent" name="state" value="removeuser" ${check("removeuser")}>
       |  <label for="radioRemoveStudent"><b>Tabort användare</b></label> &nbsp; 
