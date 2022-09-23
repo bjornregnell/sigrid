@@ -1,5 +1,5 @@
 object ui {
-  val MonitorReloadEverySeconds = 2
+  val MonitorReloadEverySeconds = 10
 
   val validStudentState = Set("work", "help", "ready", "exit")
   
