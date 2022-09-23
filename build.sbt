@@ -1,12 +1,6 @@
-lazy val scala212 = "2.12.10"
-lazy val scala213 = "2.13.9"
-lazy val supportedScalaVersions = List(scala213, scala212)
-
-crossScalaVersions := supportedScalaVersions
-
 ThisBuild / organization := "se.bjornregnell"
-ThisBuild / version      := "0.1.0-SNAPSHOT"
-ThisBuild / scalaVersion := scala213
+ThisBuild / version      := "0.2.0-SNAPSHOT"
+ThisBuild / scalaVersion := "2.13.9"
 
 // https://mvnrepository.com/artifact/org.jsoup/jsoup
 libraryDependencies += "com.typesafe.akka" %% "akka-http"   % "10.1.10"
