@@ -134,8 +134,14 @@ object ui {
     def check(value: String) = 
       if (value == state) """checked="checked" """ else ""
 
+    def roomMessage: String = 
+      if (RoomKey.knownRooms.contains(room)) "" 
+      else s"<p>VARNING: Rum $room okänt i E-huset. Felstavat?</p>" + 
+           s"<p>Kända rum: ${RoomKey.knownRooms.mkString(", ")}.</p>"
+
     html.page(title = s"SIGRID: $userid $state", body = s"""
       |${html.h1(s"STUDENT $userid i $room")}
+      |${roomMessage}
       |<p>Välj tillstånd och klicka på gröna <i>Uppdatera</i>-knappen.</p> 
       |<form action="update" method="get">
       |<div>

@@ -31,6 +31,8 @@ object RoomKey {
   val   MaxRoomLength = 20
   val   DefaultCourse = "EDAA45"
   val     DefaultRoom = "Idét"
+  val      knownRooms = 
+    "Pluto Neptunus Uranus Saturnus Jupiter Mars Venus Elg Elgkalv Hacke Panter Ravel Alfa Beta Gamma".split(" ").toSet
 
   def validCourse(s: String): String = 
     if (s.nonEmpty) s.filter(c => c.isLetterOrDigit).take(MaxCourseLength).toUpperCase 
