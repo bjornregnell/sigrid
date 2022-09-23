@@ -91,7 +91,7 @@ case class Room(
 
   def isActive: Boolean = supervisors.nonEmpty || students.nonEmpty
 
-  def isRemovable: Boolean = isExpired || !isActive
+  def isRemovable: Boolean = !isActive //|| isExpired commented away because of complaints about sudden time-controlled room purge 
 
   override def toString = 
     s"Room($course, $name, supervisor=$supervisors, students=$students), helpQueue=$helpQueue, approvalQueue=$approvalQueue, created=${created})"
