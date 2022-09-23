@@ -24,8 +24,8 @@ object SigridServer extends WebServer with SigridActions {
         supervisorLogin(vn(n), vc(c), vr(r), vs(s))
     } } } ~
     path("beppe" / "update") { get { 
-      parameters("userid", "course", "room", "state") { (u, c, r, s) =>
-        supervisorUpdate(vu(u), vc(c), vr(r), vs(s))
+      parameters("userid", "course", "room", "state", "name") { (u, c, r, s, n) =>
+        supervisorUpdate(vu(u), vc(c), vr(r), vs(s), vu(n))
     } } } ~
     path("sigrid") { get {
         log(s"request: /sigrid")

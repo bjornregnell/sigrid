@@ -58,7 +58,7 @@ trait SigridActions {
     reply(ui.studentUpdatePage(u.id, course, room, state))
   }
 
-  def errorMessageIfMissing(u: String, c: String, r: String, s: String, isValidState: Set[String]): Option[String] = {
+  def errorMessage(u: String, c: String, r: String, s: String, isValidState: Set[String]): Option[String] = {
     val uidOpt: Option[User] = User.fromUserId(u)
     val hasUser: Boolean = uidOpt.map(uid => db.hasUser(uid)).getOrElse(false)
     val result = 
@@ -70,10 +70,9 @@ trait SigridActions {
     result
   }
 
-  def supervisorUpdate(u: String, c: String, r: String, s: String): StandardRoute = {
-    log(s"request: /beppe/room?userid=$u&course=$c&room=$r&state=$s")
-    errorMessageIfMissing(u: String, c: String, r: String, s: String,
-                          ui.validSupervisorState)
+  def supervisorUpdate(u: String, c: String, r: String, s: String, n: String): StandardRoute = {
+    log(s"request: /beppe/room?userid=$u&course=$c&room=$r&state=$s&name=$n")
+    errorMessage(u=u, c=c, r=r, s=s, isValidState=ui.validSupervisorState)
       .map(errMsg => reply(ui.supervisorStartPage(errMsg)))
       .getOrElse (
         s match {
@@ -86,28 +85,46 @@ trait SigridActions {
             val rOpt = db.popHelpQueue(c,r)
             val err: String = if (rOpt.isEmpty) s"Error: $u" else u
             log(s"$err pop help queue in $rOpt")
-            reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
+            reply(ui.supervisorUpdatePage(u, c, r, "supervising", "Hjälpkö poppad.")) 
 
           case "popready" => 
             log(s"popready chosen by supervisor $u")
             val rOpt = db.popApprovalQueue(c,r)
             val err: String = if (rOpt.isEmpty) s"Error: $u" else u
             log(s"$err pop ready queue in $rOpt")
-            reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
+            reply(ui.supervisorUpdatePage(u, c, r, "supervising", "Redovisningskö poppad.")) 
 
           case "clearhelp" => 
             log(s"clearhelp chosen by supervisor $u")
             val rOpt = db.clearHelpQueue(c,r)
             val err: String = if (rOpt.isEmpty) s"Error: $u" else u
             log(s"$err cleared help queue in $rOpt")
-            reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
+            reply(ui.supervisorUpdatePage(u, c, r, "supervising", "Hjälpkö tömd.")) 
 
           case "clearready" => 
             log(s"clearready chosen by supervisor $u")
             val rOpt = db.clearApprovalQueue(c,r)
             val err: String = if (rOpt.isEmpty) s"Error: $u" else u
             log(s"$err cleared ready queue in $rOpt")
-            reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
+            reply(ui.supervisorUpdatePage(u, c, r, "supervising", "Redovisningskö tömd.")) 
+
+          case "removeuser" =>
+            log(s"state removeuser: supervisor=$u; try remove name=$n")
+            if (u != n) {
+              val uOpt = User.fromUserId(n)
+              val okOpt = uOpt.map(db.removeUser)
+              if (!okOpt.getOrElse(false)) {
+                log(s"ERROR: cannot remove $n not in ${db.users}")
+                reply(ui.supervisorUpdatePage(u, c, r, "supervising", s"ERROR: användare $n saknas i ${db.users}"))
+              } else {
+                log(s"removing user $n requested by $u in room $r in course $c")
+                reply(ui.supervisorUpdatePage(u, c, r, "supervising", s"Användare $n borttagen"))
+              }
+            } else {
+              log(s"ERROR: attempt to remove self $u")
+              reply(ui.supervisorUpdatePage(u, c, r, "supervising", s"ERROR: du kan inte ta bort dig själv $n"))
+            }
+            
 
           case "gone" => 
             log(s"gone supervisor $u")
@@ -132,17 +149,15 @@ trait SigridActions {
             reply(ui.supervisorStartPage(s"Rummet raderades av $u")) 
 
           case _ => 
-            log(s"ERROR: supervisor state unknown: $s")
-            reply(ui.supervisorUpdatePage(u, c, r, "supervising")) 
+            log(s"ERROR: supervisor state unknown: $s for user=$u course=$c room=$r")
+            reply(ui.supervisorUpdatePage(u, c, r, "supervising", "")) 
         }
       )
   }
 
   def studentUpdate(u: String, c: String, r: String, s: String): StandardRoute = {
     log(s"request: /sigrid/room?userid=$u&course=$c&room=$r&state=$s")
-
-    errorMessageIfMissing(u: String, c: String, r: String, s: String,
-                          ui.validStudentState)
+    errorMessage(u=u, c=c, r=r, s=s, isValidState=ui.validStudentState)
       .map(errMsg => reply(ui.studentStartPage(errMsg)))
       .getOrElse (
         s match {
