@@ -36,7 +36,7 @@ object RoomKey {
 
   def roomWarning(room: String): String = 
     if (RoomKey.knownRooms.contains(room)) "" 
-    else s"<p>VARNING: Rum $room okänt i E-huset. Felstavat?</p>" + 
+    else s"""<p class="blink">VARNING: Rum $room okänt i E-huset. Felstavat?</p>""" + 
          s"<p>Kända rum: ${RoomKey.knownRooms.mkString(", ")}.</p>"
 
 

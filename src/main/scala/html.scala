@@ -32,29 +32,38 @@ object html {
     |    font-size: 150%;
     |    margin: 2px 2px;
     |}
-    .radio-toolbar input[type="radio"] {
-      opacity: 0;
-      position: fixed;
-      width: 0;
-    }
-    .radio-toolbar label {
-      display: inline-block;
-      background-color:  #ddd;
-      font-weight:300;
-      padding: 10px 20px;
-      font-size: 32px;
-      border: 8px solid #444;
-      border-radius: 38px;
-    }
-    .radio-toolbar input[type="radio"]:checked + label {
-      background-color: #fcba03;
-      font-weight:900;
-      border-color: #c700d1;
-    }
-    .radio-toolbar input[type="radio"]:focus + label {
-      border: 8px dashed #444;
-    }
-    """.stripMargin
+    |.radio-toolbar input[type="radio"] {
+    |  opacity: 0;
+    |  position: fixed;
+    |  width: 0;
+    |}
+    |.radio-toolbar label {
+    |  display: inline-block;
+    |  background-color:  #ddd;
+    |  font-weight:300;
+    |  padding: 10px 20px;
+    |  font-size: 32px;
+    |  border: 8px solid #444;
+    |  border-radius: 38px;
+    |}
+    |.radio-toolbar input[type="radio"]:checked + label {
+    |  background-color: #fcba03;
+    |  font-weight:900;
+    |  border-color: #c700d1;
+    |}
+    |.radio-toolbar input[type="radio"]:focus + label {
+    |  border: 8px dashed #444;
+    |}
+    |.blink {
+    |  animation: blinker 1.5s linear infinite;
+    |  font-weight: bold;
+    |}
+    |@keyframes blinker {
+    |  50% {
+    |    opacity: 0;
+    |  }
+    |}
+    |""".stripMargin
 
   def page(body: String, title: String, reloadEverySeconds: Int = 0): String = s"""<!DOCTYPE html>
     |<html><head><meta charset="UTF-8">
