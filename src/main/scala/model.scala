@@ -53,7 +53,7 @@ object RoomKey {
 }
 
 object Room {
-  val HoursUntilExpired = 3
+  val HoursUntilExpired = 10
 }
 case class Room(
   course: String, 
@@ -99,7 +99,7 @@ case class Room(
 
   def isActive: Boolean = supervisors.nonEmpty || students.nonEmpty
 
-  def isRemovable: Boolean = !isActive //|| isExpired commented away because of complaints about sudden time-controlled room purge 
+  def isRemovable: Boolean = !isActive || isExpired 
 
   override def toString = 
     s"Room($course, $name, supervisor=$supervisors, students=$students), helpQueue=$helpQueue, approvalQueue=$approvalQueue, created=${created})"
