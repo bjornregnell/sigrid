@@ -19,17 +19,17 @@ object ui {
   |    <p> $msg </p>
   |    <label for="name">   <b>Förnamn:</b> </label>
   |    <input name="name" id="name" value="" class="smallinput" required>
-  |    Exempel: kim
+  |    Exempel: <b>kim</b>
   |    <br>
   |
   |    <label for="kurskod"><b>Kurskod:</b> </label>
   |    <input name="course" id="course" value="EDAA45" class="smallinput" required>
-  |    Exempel: EDAA45
+  |    Exempel: <b>EDAA45</b>
   |    <br>
   |
   |    <label for="rum">  &nbsp;&nbsp;&nbsp;  <b>Rum:</b> </label>  
   |    <input name="room" id="room" value="" class="smallinput"  required>
-  |    Exempel: Hacke 
+  |    Exempel: <b>Hacke</b> (<b>Distans</b> om fjärran) 
   |    <br>
   |
   |    <input type="hidden" name="state" value="$state">
@@ -135,7 +135,7 @@ object ui {
       if (value == state) """checked="checked" """ else ""
 
     html.page(title = s"SIGRID: $userid $state", body = s"""
-      |${html.h1(s"STUDENT $userid i $room")}
+      |${html.h1(s"STUDENT $userid ${if (room == "Distans") "på" else "i"} $room")}
       |${RoomKey.roomWarning(room)}
       |<p>Välj tillstånd och klicka på gröna <i>Uppdatera</i>-knappen.</p> 
       |<form action="update" method="get">
