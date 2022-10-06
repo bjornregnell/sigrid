@@ -32,12 +32,12 @@ object RoomKey {
   val   DefaultCourse = "EDAA45"
   val     DefaultRoom = "Idét"
   val      knownRooms = 
-    "Pluto Neptunus Uranus Saturnus Jupiter Mars Venus Elg Elgkalv Hacke Panter Ravel Val Falk Varg Alfa Beta Gamma".split(" ").toSet
+    "Pluto Neptunus Uranus Saturnus Jupiter Mars Venus Elg Elgkalv Hacke Panter Ravel Val Falk Varg Alfa Beta Gamma Idét Distans".split(" ").toSet
 
   def roomWarning(room: String): String = 
     if (RoomKey.knownRooms.contains(room)) "" 
     else s"""<p class="blink">VARNING: Rum $room okänt i E-huset. Felstavat?</p>""" + 
-         s"<p>Kända rum: ${RoomKey.knownRooms.mkString(", ")}.</p>"
+         s"<p>Kända rum: ${RoomKey.knownRooms.toSeq.sorted.mkString(", ")}.</p>"
 
 
   def validCourse(s: String): String = 
