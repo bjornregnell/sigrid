@@ -70,8 +70,8 @@ trait SigridActions {
     result
   }
 
-  def supervisorUpdate(u: String, c: String, r: String, s: String, n: String): StandardRoute = {
-    log(s"request: /beppe/room?userid=$u&course=$c&room=$r&state=$s&name=$n")
+  def supervisorUpdate(u: String, c: String, r: String, s: String, n: String, o: String): StandardRoute = {
+    log(s"request: /beppe/room?userid=$u&course=$c&room=$r&state=$s&name=$n&other=$o")
     errorMessage(u=u, c=c, r=r, s=s, isValidState=ui.validSupervisorState)
       .map(errMsg => reply(ui.supervisorStartPage(errMsg)))
       .getOrElse (
@@ -125,6 +125,20 @@ trait SigridActions {
               reply(ui.supervisorUpdatePage(u, c, r, "supervising", s"ERROR: du kan inte ta bort dig själv $n"))
             }
             
+          case "mergeroom" =>
+            log(s"state mergeroom: supervisor=$u; try merge room other=$o into this room=$r")
+            if (db.hasRoom(course = c,roomName = o)) {
+                log(s"Merging this room $r with other room $o in course $c")
+                log(s"Other Room to merge and remove:\n${db.roomsToMap(RoomKey(c, o))}")
+                val updatedOpt = db.mergeRooms(course = c, fromRoomName = o, toRoomName = r)
+                if (updatedOpt.isDefined) 
+                  reply(ui.supervisorUpdatePage(u, c, r, "supervising", s"Rummet $o har tagits bort och alla flyttats hit"))
+                else 
+                  reply(ui.supervisorUpdatePage(u, c, r, "supervising", s"ERROR: Rummet $o kan inte slås ihop med sig själv."))
+            } else {
+              log(s"ERROR: could not merge non-existing room other=$o")
+              reply(ui.supervisorUpdatePage(u, c, r, "supervising", s"ERROR: kan inte slå ihop ej existerande $o"))
+            }
 
           case "gone" => 
             log(s"gone supervisor $u")
@@ -155,7 +169,19 @@ trait SigridActions {
       )
   }
 
-  def studentUpdate(u: String, c: String, r: String, s: String): StandardRoute = {
+  def studentUpdate(u: String, c: String, roomCheck: String, s: String): StandardRoute = {
+    val uOpt = User.fromUserId(u)
+    var movedToRoomMsg = ""
+    // för att undvika att u inte är i något icke-existerande rum (pga mergeroom)
+    val r: String = if (!db.hasRoom(c, roomCheck) && uOpt.isDefined) {
+      val rOpt: Option[Room] = db.findUserInSomeRoom(uOpt.get)
+      if (rOpt.isDefined) {
+        val rn = rOpt.get.name
+        if (rn != roomCheck) movedToRoomMsg = s"Du har flyttats till rum $rn" 
+        log(s"User $u is in a non-existing room, moved to $rn")
+        rn
+      } else roomCheck
+    } else roomCheck
     log(s"request: /sigrid/room?userid=$u&course=$c&room=$r&state=$s")
     errorMessage(u=u, c=c, r=r, s=s, isValidState=ui.validStudentState)
       .map(errMsg => reply(ui.studentStartPage(errMsg)))
@@ -163,32 +189,29 @@ trait SigridActions {
         s match {
           case "exit" => 
             log(s"hejdå student $u")
-            val uOpt = User.fromUserId(u)
+            
             val okOpt = uOpt.map(db.removeUser)
             if (!okOpt.getOrElse(false)) log(s"ERROR: removeUser $u $uOpt") 
             reply(ui.studentStartPage(s"Student $u har sagt hejdå."))
           
           case "help" => 
-            val uOpt = User.fromUserId(u)
             val rOpt = uOpt.flatMap(u => db.wantHelp(u, c, r))
-            log(s"help $u changed room to $rOpt")
-            reply(ui.studentUpdatePage(u, c, r, s))
+            log(s"help $u updated room to $rOpt")
+            reply(ui.studentUpdatePage(u, c, r, s, msg = movedToRoomMsg))
 
           case "ready" => 
-            val uOpt = User.fromUserId(u)
             val rOpt = uOpt.flatMap(u => db.wantApproval(u, c, r))
-            log(s"ready $u changed room to $rOpt")
-            reply(ui.studentUpdatePage(u, c, r, s))
+            log(s"ready $u updated room to $rOpt")
+            reply(ui.studentUpdatePage(u, c, r, s, msg = movedToRoomMsg))
 
           case "work" => 
-            val uOpt = User.fromUserId(u)
             val rOpt = uOpt.flatMap(u => db.working(u, c, r))
-            log(s"work $u changed room to $rOpt")
-            reply(ui.studentUpdatePage(u, c, r, s)) 
+            log(s"work $u updated room to $rOpt")
+            reply(ui.studentUpdatePage(u, c, r, s, msg = movedToRoomMsg)) 
 
           case _ => 
             log(s"ERROR: student state unknown: $s")
-            reply(ui.studentUpdatePage(u, c, r, "work")) 
+            reply(ui.studentUpdatePage(u, c, r, "work", msg = "förvirrat tillstånd")) 
         }
       )
   }

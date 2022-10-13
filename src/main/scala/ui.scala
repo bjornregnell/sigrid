@@ -3,7 +3,7 @@ object ui {
 
   val validStudentState = Set("work", "help", "ready", "exit")
   
-  val validSupervisorState = Set("supervising", "pophelp", "popready", "clearhelp", "clearready", "removeuser", "gone", "purge")
+  val validSupervisorState = Set("supervising", "pophelp", "popready", "clearhelp", "clearready", "removeuser", "mergeroom", "gone", "purge")
  
   def showRawDatabase: String = s"""
     <p><br>----- raw database toStrings for debugging purposes -----<br> 
@@ -130,13 +130,14 @@ object ui {
     s"$heading \n $table"
   }
 
-  def studentUpdatePage(userid: String, course: String, room: String, state: String): String = {
+  def studentUpdatePage(userid: String, course: String, room: String, state: String, msg: String = ""): String = {
     def check(value: String) = 
       if (value == state) """checked="checked" """ else ""
 
     html.page(title = s"SIGRID: $userid $state", body = s"""
       |${html.h1(s"STUDENT $userid ${if (room == "Distans") "på" else "i"} $room")}
       |${RoomKey.roomWarning(room)}
+      |${if (msg.nonEmpty) s"<p> $msg </p>" else ""}
       |<p>Välj tillstånd och klicka på gröna <i>Uppdatera</i>-knappen.</p> 
       |<form action="update" method="get">
       |<div>
@@ -207,6 +208,10 @@ object ui {
       |  <p><input type="radio" id="radioRemoveStudent" name="state" value="removeuser" ${check("removeuser")}>
       |  <label for="radioRemoveStudent"><b>Tabort användare</b></label> &nbsp; 
       |  namn-nr: <input name="name" id="name" value="" class="smallinput"> VARNING!</p>
+      | 
+      |  <p><input type="radio" id="radioMergeRoom" name="state" value="mergeroom" ${check("mergeroom")}>
+      |  <label for="radioMergeRoom"><b>Slå ihop rum</b></label> &nbsp; 
+      |  Andra rummet: <input name="other" id="other" value="" class="smallinput"> VARNING!</p>
       | 
       |  <p><input type="radio" id="radioGone" name="state" value="gone"  ${check("gone")}> 
       |  <label for="radioGone"><b>Hejdå</b></label> &nbsp; Handledare lämnar,  rummet finns kvar.</p> 

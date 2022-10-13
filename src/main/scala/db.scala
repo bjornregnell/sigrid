@@ -70,6 +70,18 @@ object db {
     found
   }
 
+  def findUserInSomeRoom(u: User): Option[Room] = {
+    var found = false
+    val it = roomStore.values.iterator
+    var r: Room = null
+    while (!found && it.hasNext) {
+      r = it.next()
+      if (r.students.contains(u) || r.supervisors.contains(u)) found = true      
+    }
+    if (found) Some(r) else None
+  }
+
+
   def purgeRemovableRooms(): Int = {  // TODO: investigate if this is thread safe ???
     var n = 0
     roomKeys.foreach { rk =>
@@ -116,6 +128,34 @@ object db {
       if (rOpt.isEmpty) Option(Room(course = rk.course, name = rk.roomName)) 
       else rOpt
     }
+  }
+
+  /** Merge fromRoomName into toRoomName if both exists and delete fromRoomKey,
+    * returns merged room if it exists, or None if fromRoomName == toRoomName*/
+  def mergeRooms(
+    course: String, 
+    fromRoomName: String, 
+    toRoomName: String, 
+  ): Option[Room] = {
+    if (fromRoomName != toRoomName) { // must be different
+      val fromRoomKey = RoomKey(course, fromRoomName)
+      val toRoomKey   = RoomKey(course, toRoomName)
+      roomStore.update(toRoomKey){ toOpt =>
+        toOpt.map { t =>
+          val fromOpt: Option[Room] = roomStore.get(fromRoomKey) 
+          if (fromOpt.isDefined) {
+            val f = fromOpt.get
+            val updatedRoom = t.copy(
+              students = t.students ++ f.students, 
+              helpQueue = t.helpQueue ++ f.helpQueue, 
+              approvalQueue = t.approvalQueue ++ f.approvalQueue
+            )
+            roomStore.remove(fromRoomKey)
+            updatedRoom
+          } else t  // don't change anything if fromRoom does not exist 
+        }
+      }
+    } else None
   }
 
   def addStudentIfRoomExists(
