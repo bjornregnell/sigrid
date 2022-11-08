@@ -60,30 +60,30 @@ case class Room(
   name: String, 
   supervisors: Set[User] = Set(),
   students: Set[User] = Set(), 
-  helpQueue: Vector[User] = Vector(), 
-  approvalQueue: Vector[User] = Vector(), 
+  helpQueue: Vector[(User, Date)] = Vector(), 
+  approvalQueue: Vector[(User, Date)] = Vector(), 
   created: Date = Date.now(),
 ){
   def wantHelp(u: User): Room = copy(
-    helpQueue = if (helpQueue.contains(u)) helpQueue else helpQueue :+ u,
-    approvalQueue = approvalQueue.filterNot(_ == u)
+    helpQueue = if (helpQueue.exists(_._1 == u)) helpQueue else helpQueue :+ (u, Date.now()),
+    approvalQueue = approvalQueue.filterNot(_._1 == u)
   )
 
   def wantApproval(u: User): Room = copy(
-    helpQueue = helpQueue.filterNot(_ == u),
-    approvalQueue = if (approvalQueue.contains(u)) approvalQueue else approvalQueue :+ u
+    helpQueue = helpQueue.filterNot(_._1 == u),
+    approvalQueue = if (approvalQueue.exists(_._1 == u)) approvalQueue else approvalQueue :+ (u, Date.now())
   )
 
   def working(u: User): Room = copy(
     students = students + u,
-    helpQueue = helpQueue.filterNot(_ == u),
-    approvalQueue = approvalQueue.filterNot(_ == u)
+    helpQueue = helpQueue.filterNot(_._1 == u),
+    approvalQueue = approvalQueue.filterNot(_._1 == u)
   )
 
   def goodbye(u: User): Room = copy(
     students = students - u,
-    helpQueue = helpQueue.filterNot(_ == u),
-    approvalQueue = approvalQueue.filterNot(_ == u),
+    helpQueue = helpQueue.filterNot(_._1 == u),
+    approvalQueue = approvalQueue.filterNot(_._1 == u),
     supervisors = supervisors - u
   )
 
@@ -100,6 +100,8 @@ case class Room(
   def isActive: Boolean = supervisors.nonEmpty || students.nonEmpty
 
   def isRemovable: Boolean = !isActive || isExpired 
+
+  def longestWaitingTimeMinutes: Int = ???
 
   override def toString = 
     s"Room($course, $name, supervisor=$supervisors, students=$students), helpQueue=$helpQueue, approvalQueue=$approvalQueue, created=${created})"
