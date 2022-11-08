@@ -105,11 +105,11 @@ object ui {
 
       &nbsp;&nbsp; <i>hjälpkö:</i> 
       ${r.helpQueue.length} 
-      ${r.helpQueue.mkString(",")} <br>
+      ${r.helpQueueString()} <br>
 
       &nbsp;&nbsp; <i>redovkö:</i> 
       ${r.approvalQueue.length} 
-      ${r.approvalQueue.mkString(",")}
+      ${r.approvalQueueString()}
     </p>
     """
   }
