@@ -71,7 +71,7 @@ object Room {
       }
 
       if (vector.size >= 1) {
-        val headWaited = f"(<strong>${vector.head._1.id}</strong>: <small>Väntat ${durationWaited(vector.head)} min</small>)"
+        val headWaited = f"(<strong>${vector.head._1}</strong>: <small>Väntat ${durationWaited(vector.head)} min</small>)"
         if (vector.size > 1) {
           headWaited + ", " + vector.tail.map(_._1).mkString(", ")
         } else {
