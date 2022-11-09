@@ -62,14 +62,18 @@ object Room {
         Duration.between(element._2.dateTime, Date.now().dateTime)
       }
 
-      def durationWaited(element: (User, Date)): String = {
-        f"${(timeWaited(element).toSeconds()/60.0)}%.1f"
+      def durationWaited(element: (User, Date), keepOneDecimal: Boolean = false): String = {
+        if (keepOneDecimal) {
+          f"${(timeWaited(element).toSeconds()/60.0)}%.1f" // Keeping it here if we want to swich to keeping one decimal.
+        } else {
+          Math.round(timeWaited(element).toSeconds()/60.0).toString()
+        }
       }
 
       if (vector.size >= 1) {
-        val headWaited = f"(<strong>${vector.head._1.id}</strong>: <small>Väntat ${durationWaited(vector.head)} min</small>) "
+        val headWaited = f"(<strong>${vector.head._1.id}</strong>: <small>Väntat ${durationWaited(vector.head)} min</small>)"
         if (vector.size > 1) {
-          headWaited + vector.tail.map(_._1).mkString(",")
+          headWaited + ", " + vector.tail.map(_._1).mkString(", ")
         } else {
           headWaited
         }
