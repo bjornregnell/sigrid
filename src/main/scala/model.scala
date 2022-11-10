@@ -62,7 +62,7 @@ object Room {
         Duration.between(element._2.dateTime, Date.now().dateTime)
       }
 
-      def durationWaited(element: (User, Date), keepOneDecimal: Boolean = false): String = {
+      def showDurationWaited(element: (User, Date), keepOneDecimal: Boolean = false): String = {
         if (keepOneDecimal) {
           f"${(timeWaited(element).toSeconds()/60.0)}%.1f" // Keeping it here if we want to switch to keeping one decimal.
         } else {
@@ -71,7 +71,9 @@ object Room {
       }
 
       if (vector.size >= 1) {
-        val headWaited = f"(<strong>${vector.head._1}</strong>: <small>${durationWaited(vector.head)} min i kö</small>)"
+        val t = showDurationWaited(vector.head)
+        val waitMsg = if (t == "0") "" else s"<small> köat $t min</small>"
+        val headWaited = f"<strong>${vector.head._1}</strong>$waitMsg"
         if (vector.size > 1) {
           headWaited + ", " + vector.tail.map(_._1).mkString(", ")
         } else {
