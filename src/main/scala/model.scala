@@ -1,3 +1,5 @@
+import java.time.Duration
+
 case class User(name: String, number: Int){
   require(name == User.validName(name), s"invalid user name: $name")
   require(number > 0, s"invalid user number: $number")
@@ -54,7 +56,33 @@ object RoomKey {
 
 object Room {
   val HoursUntilExpired = 10
+
+  def queueToStringWithTimer(vector: Vector[(User, Date)]): String = {
+      def timeWaited(element: (User, Date)): Duration = {
+        Duration.between(element._2.dateTime, Date.now().dateTime)
+      }
+
+      def durationWaited(element: (User, Date), keepOneDecimal: Boolean = false): String = {
+        if (keepOneDecimal) {
+          f"${(timeWaited(element).toSeconds()/60.0)}%.1f" // Keeping it here if we want to swich to keeping one decimal.
+        } else {
+          Math.round(timeWaited(element).toSeconds()/60.0).toString()
+        }
+      }
+
+      if (vector.size >= 1) {
+        val headWaited = f"(<strong>${vector.head._1}</strong>: <small>Väntat ${durationWaited(vector.head)} min</small>)"
+        if (vector.size > 1) {
+          headWaited + ", " + vector.tail.map(_._1).mkString(", ")
+        } else {
+          headWaited
+        }
+      } else {
+        ""
+      }
+    }
 }
+
 case class Room(
   course: String, 
   name: String, 
@@ -86,6 +114,9 @@ case class Room(
     approvalQueue = approvalQueue.filterNot(_._1 == u),
     supervisors = supervisors - u
   )
+
+  def helpQueueString(): String = Room.queueToStringWithTimer(helpQueue)
+  def approvalQueueString(): String = Room.queueToStringWithTimer(approvalQueue)
 
   def clearHelpQueue(): Room = copy(helpQueue = Vector())
 
