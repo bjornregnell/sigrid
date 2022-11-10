@@ -64,7 +64,7 @@ object Room {
 
       def durationWaited(element: (User, Date), keepOneDecimal: Boolean = false): String = {
         if (keepOneDecimal) {
-          f"${(timeWaited(element).toSeconds()/60.0)}%.1f" // Keeping it here if we want to swich to keeping one decimal.
+          f"${(timeWaited(element).toSeconds()/60.0)}%.1f" // Keeping it here if we want to switch to keeping one decimal.
         } else {
           Math.round(timeWaited(element).toSeconds()/60.0).toString()
         }
