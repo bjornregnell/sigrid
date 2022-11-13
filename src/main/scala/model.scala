@@ -57,11 +57,11 @@ object RoomKey {
 object Room {
   val HoursUntilExpired = 10
 
-  def queueToStringWithTimer(vector: Vector[(User, Date)]): String = {
-      def timeWaited(element: (User, Date)): Duration = {
+  def timeWaited(element: (User, Date)): Duration = {
         Duration.between(element._2.dateTime, Date.now().dateTime)
       }
 
+  def queueToStringWithTimer(vector: Vector[(User, Date)]): String = {
       def showDurationWaited(element: (User, Date), keepOneDecimal: Boolean = false): String = {
         if (keepOneDecimal) {
           f"${(timeWaited(element).toSeconds()/60.0)}%.1f" // Keeping it here if we want to switch to keeping one decimal.
@@ -119,6 +119,17 @@ case class Room(
 
   def helpQueueString(): String = Room.queueToStringWithTimer(helpQueue)
   def approvalQueueString(): String = Room.queueToStringWithTimer(approvalQueue)
+
+  def maxQueuingTime(): Int = {
+    // Returns the maximum queuing time of both queues as an integer of minutes.
+    val queueingTimes = (
+      if (helpQueue.size >= 1) Room.timeWaited(helpQueue.head).toMinutes().toInt else 0,
+      if (approvalQueue.size >= 1) Room.timeWaited(approvalQueue.head).toMinutes().toInt else 0
+    )
+    Math.max(
+      queueingTimes._1, queueingTimes._2
+    )
+  }
 
   def clearHelpQueue(): Room = copy(helpQueue = Vector())
 
