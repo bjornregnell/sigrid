@@ -92,7 +92,9 @@ object ui {
     ${if (isShowCourse) r.course else ""} ${r.name}: ${r.students.size} studenter, 
     handl ${r.supervisors.map(_.id)}, 
     ${showQueueLength("hjälp",r.helpQueue.length)},
-    ${showQueueLength("redov", r.approvalQueue.length)}  
+    ${showQueueLength("redov", r.approvalQueue.length)}
+    ${if (r.maxQueuingTime() > 0) f", Köat: ${r.maxQueuingTime()} min" else ""}
+  
   """
   
   def showRoomLong(roomName: String, course: String): String = {
