@@ -34,7 +34,7 @@ object RoomKey {
   val   DefaultCourse = "EDAA45"
   val     DefaultRoom = "Idét"
   val      knownRooms = 
-    "Pluto Neptunus Uranus Saturnus Jupiter Mars Venus Elg Elgkalv Hacke Panter Ravel Val Falk Varg Alfa Beta Gamma Idét Distans".split(" ").toSet
+    "Pluto Neptunus Uranus Saturnus Jupiter Mars Venus Elg Elgkalv Hacke Panter Ravel Val Falk Varg Lo Alfa Beta Gamma Idét Distans".split(" ").toSet
 
   def roomWarning(room: String): String = 
     if (RoomKey.knownRooms.contains(room)) "" 
