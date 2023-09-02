@@ -61,7 +61,7 @@ trait SigridActions {
   def errorMessage(u: String, c: String, r: String, s: String, isValidState: Set[String]): Option[String] = {
     val uidOpt: Option[User] = User.fromUserId(u)
     val hasUser: Boolean = uidOpt.map(uid => db.hasUser(uid)).getOrElse(false)
-    val result = 
+    val result = // TODO: these log error messages should not be either all; many kan happen...
       if (!db.hasRoom(c, r)) Some(s"ERROR: Rum $r i kurs $c saknas!")
       else if (!hasUser) Some(s"ERROR: $u saknas!")
       else if (!isValidState(s)) Some(s"ERROR: okänt tillstånd: $s")
