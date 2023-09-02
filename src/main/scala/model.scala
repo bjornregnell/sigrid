@@ -36,15 +36,19 @@ object RoomKey {
   val      knownRooms = 
     "Pluto Neptunus Uranus Saturnus Jupiter Mars Venus Elg Elgkalv Hacke Panter Ravel Val Falk Varg Lo Alfa Beta Gamma Idét Distans".split(" ").toSet
 
-  def roomWarning(room: String): String = 
-    if (RoomKey.knownRooms.contains(room)) "" 
-    else s"""<p class="blink">VARNING: Rum $room okänt i E-huset. Felstavat?</p>""" + 
-         s"<p>Kända rum: ${RoomKey.knownRooms.toSeq.sorted.mkString(", ")}.</p>"
+  val fromCourseCodeToCourseName = // THIS IS A HACK, same thing different name, see https://kurser.lth.se/lot/course-syllabus/23_24/EITA65
+    Map("EDAA45" -> "PGK", "EDAA60" -> "DOD", "EITA65" -> "DOD") 
 
+  def roomWarning(room: String): String = 
+    if (RoomKey.knownRooms.contains(room)) "" else  
+      s"""<p class="blink">VARNING: Rum $room okänt i E-huset. Felstavat?</p>""" + 
+        s"<p>Kända rum: ${RoomKey.knownRooms.toSeq.sorted.mkString(", ")}.</p>"
 
   def validCourse(s: String): String = 
-    if (s.nonEmpty) s.filter(c => c.isLetterOrDigit).take(MaxCourseLength).toUpperCase 
-    else DefaultCourse
+    if (s.nonEmpty) {
+      val course = s.filter(c => c.isLetterOrDigit).take(MaxCourseLength).toUpperCase
+      fromCourseCodeToCourseName.getOrElse(course.take(6), course)
+    } else DefaultCourse
   
   def validRoomName(s: String): String = 
     if (s.nonEmpty) s.filter(c => c.isLetterOrDigit).take(MaxRoomLength).toLowerCase.capitalize 
