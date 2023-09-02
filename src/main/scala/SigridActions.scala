@@ -53,7 +53,7 @@ trait SigridActions {
     log(s"room before update: $rOpt")
     
     val rOpt2 = db.addStudentIfRoomExists(u, course, room)
-    log(s"room after updated: $rOpt")
+    log(s"room after updated: $rOpt2")
 
     reply(ui.studentUpdatePage(u.id, course, room, state))
   }
