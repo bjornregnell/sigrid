@@ -61,11 +61,11 @@ object ui {
     html.page(
       title = "BEPPE LOGIN", 
       body = s"""
-       |   ${sigridHeader("BEPPE")}
-       |   ${loginForm(msg, action = "/beppe/login", state = "supervising")}
-       |   ${showAllRooms(course = None, exceptRoom = None)}
-       |   $showRawDatabase
-       |""".stripMargin
+        |   ${sigridHeader("BEPPE")}
+        |   ${loginForm(msg, action = "/beppe/login", state = "supervising")}
+        |   ${showAllRooms(course = None, exceptRoom = None)}
+        |   $showRawDatabase
+        |""".stripMargin
     ) 
   
   def monitorPage(): String = 
