@@ -31,7 +31,7 @@ case class RoomKey private (course: String, roomName: String){
 object RoomKey {
   val MaxCourseLength = 25
   val   MaxRoomLength = 20
-  val   DefaultCourse = "EDAA45"
+  val   DefaultCourse = "pgk"
   val     DefaultRoom = "Idét"
   val      knownRooms = 
     "Pluto Neptunus Uranus Saturnus Jupiter Mars Venus Elg Elgkalv Hacke Panter Ravel Val Falk Varg Lo Alfa Beta Gamma Idét Distans".split(" ").toSet
