@@ -1,38 +1,36 @@
-# sigrid
+# Sigrid
+
+## About
+
 A help queue web app for lab sessions and tutorials named after the doll [Sigrid](https://www.youtube.com/watch?v=cc-TAuKWdTI) in  "Beppes godnattstund".
 
-# How to use a running sigrid server
+## About the 2.x branch
 
-When sigrid is running it responds to the following requests:
+This branch is a rewrite of Sigrid from scratch with minimal complexity lean Scala using 
+* Scala >= 3.5.0
+* OpenJDK >= 21
+* [Scala CLI](https://scala-cli.virtuslab.org/) as build tool
+* [cask](https://github.com/com-lihaoyi/cask) instead of akka
+* [storky](https://github.com/bjornregnell/storky) as the in-memory, thread-safe key-value-store
 
-* `/sigrid` provides a login page for students. No password is required. Each user will get a unique user name. When a student have logged in, these states are selectable:
-  - `Köar inte` - not standing in any queue; used when working or getting help.
-  - `Hjäälp!!!` - when standing in the help queue.
-  - `Fäärdiig!` - when standing in the approval queue.
-  - `Loggar ut` - when being approved and the leaving the room.
+# How to use a running Sigrid server
 
-* After selecting a new state the user must press `Uppdatera` to make the state change take effect.
+TODO
 
-* `/sigrid/monitor` provides a list of all rooms and all their queues, in alphabetical order based on course code and then room name. This page reloads automatically at a regular intervall. 
+# How to run Sigrid as a server
 
-* `/beppe` provides a login page for supervisors. No password is required. Each user will get a unique user name. When you have logged in you can choose between these actions:
-  - `Jobbar` when supervisor is working.
-  - `Töm hjälpkö!` will empty the help queue
-  - `Töm redovkö!` will empty the approval queue
-  - `Hej då!` the supervisor will leave the room, but the room will continue to exist.
-  - `Radera!` the room will be inactivated. 
+* You need at least java 21 installed.
 
-# How to build and start sigrid
+* Download the latest assembly jar from Releases and start with `java -jar nameofjar.jar` and the server is now running on localhost:????
 
-* Install `git` and `sbt` if needed
+# How to build and start Sigrid from code 
 
-* `git clone` this repo and `cd` into the `sigrid` folder
+* Clone this repo
 
-* start `sbt`
-
-* type `run`
+* Run with `scala run .`
 
 * Your server is now running at `localhost:8091` open to the world if that port is forwarded in your router.
 
+* Package with `scala --power package . -o sigrid-assembly-2.x.y.jar --assembly`
 
 
