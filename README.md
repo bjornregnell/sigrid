@@ -29,7 +29,12 @@ TODO
 
 * Run with `scala run .`
 
-* Your server is now running at `localhost:8091` open to the world if that port is forwarded in your router.
+* Your server is now running at `localhost:8080` open to the world if that port is forwarded in your router.
+
+* Try the basic api
+  * `curl http://localhost:8080/`   -> "hello world"
+  * `curl -d 'k1:v1;key2:value2' http://localhost:8080/add-all`
+  * `curl http://localhost:8080/get-all`
 
 * Package with `scala --power package . -o sigrid-assembly-2.x.y.jar --assembly`
 
