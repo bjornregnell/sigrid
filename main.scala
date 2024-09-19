@@ -12,7 +12,7 @@ object MinimalApplication extends cask.MainRoutes:
   @cask.get("/get-all")
   def getAll() = 
     println("Server GET /get-all")
-    db.toMap.toString
+    db.toMap.toString + "\n"
 
   @cask.post("/reverse")
   def doThing(request: cask.Request) = 
@@ -24,7 +24,7 @@ object MinimalApplication extends cask.MainRoutes:
     println(s"Server POST /put text=${request.text()}")
     val kvs = request.text().split(";").toSeq.map(_.split(":").toSeq)
     for case Seq(k, v) <- kvs do db.put(k, v)
-    s"Added ${kvs.length} pairs"
+    s"Added ${kvs.length} pairs\n"
 
   initialize()
 
