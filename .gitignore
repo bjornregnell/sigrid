@@ -11,3 +11,4 @@
 .metals
 **/metals.sbt
 .bsp
+.vscode
