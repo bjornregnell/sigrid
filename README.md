@@ -25,7 +25,7 @@ TODO
 
 # How to build and start Sigrid from code 
 
-* Clone this repo
+* Clone this repo and checkout the v2.x branch `git checkout v2.x`
 
 * Run with `scala run .`
 
