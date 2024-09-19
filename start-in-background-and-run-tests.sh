@@ -1,0 +1,2 @@
+scala run . &
+scala test .
