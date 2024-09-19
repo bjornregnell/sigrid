@@ -1,7 +1,14 @@
 # sigrid
+
+## About
+
 A help queue web app for lab sessions and tutorials named after the doll [Sigrid](https://www.youtube.com/watch?v=cc-TAuKWdTI) in  "Beppes godnattstund".
 
-# How to use a running sigrid server
+## About the v1.x branch
+
+Sigrid v1.x will be legacy when v2.x is production ready. For more information see Releases.
+
+## How to use a running sigrid server
 
 When sigrid is running it responds to the following requests:
 
@@ -22,7 +29,7 @@ When sigrid is running it responds to the following requests:
   - `Hej då!` the supervisor will leave the room, but the room will continue to exist.
   - `Radera!` the room will be inactivated. 
 
-# How to build and start sigrid
+## How to build and start sigrid
 
 * Install `git` and `sbt` if needed
 
