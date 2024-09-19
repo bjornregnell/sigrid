@@ -1,14 +1,10 @@
 **/tmp
 **/old
-
-# Java / Scala
 **/*.class
-
-# Sbt
-
 **/target
 .bloop
 .metals
 **/metals.sbt
 .bsp
 .vscode
+.scala-build
