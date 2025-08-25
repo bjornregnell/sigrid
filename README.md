@@ -8,6 +8,8 @@ A help queue web app for lab sessions and tutorials named after the doll [Sigrid
 
 Sigrid v1.x will be legacy when v2.x is production ready. For more information see Releases.
 
+See on-going work on 2.x branch with migration to Scala 3 here: https://github.com/bjornregnell/sigrid/tree/v2.x
+
 ## How to use a running sigrid server
 
 When sigrid is running it responds to the following requests:
