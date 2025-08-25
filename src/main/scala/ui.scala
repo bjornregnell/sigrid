@@ -24,12 +24,12 @@ object ui {
   |
   |    <label for="kurskod"> &nbsp;&nbsp;&nbsp;<b>Kurs:</b> </label>
   |    <input name="course" id="course" value="${RoomKey.DefaultCourse}" class="smallinput" required>
-  |    Exempel: <b>${RoomKey.DefaultCourse}</b>, dod, ...
+  |    Exempel: <b>${RoomKey.DefaultCourse}</b>
   |    <br>
   |
   |    <label for="rum">  &nbsp;&nbsp;&nbsp;  <b>Rum:</b> </label>  
   |    <input name="room" id="room" value="" class="smallinput" required>
-  |    Exempel: <b>Hacke</b> (<b>Distans</b> om fjärran) 
+  |    Exempel: <b>Hacke</b> 
   |    <br>
   |
   |    <input type="hidden" name="state" value="$state">
