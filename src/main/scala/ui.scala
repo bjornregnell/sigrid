@@ -35,14 +35,14 @@ object ui {
   |    <input type="hidden" name="state" value="$state">
   |
   |    <button class="button">Logga in</button> 
-  |    ${html.link("http://cs.lth.se/sigrid/monitor", "SIGRID MONITOR")} 
+  |    ${html.link("http://sigrid.cs.lth.se/monitor", "SIGRID MONITOR")} 
   |  </div>
   |</form>
   |""".stripMargin
 
   def sigridHeader(heading: String): String = s"""
     ${html.h1(s"* $heading *")}
-    <p> ${html.link("http://cs.lth.se/sigrid", "Sigrid")} är en hjälpköwebbapp @ ${Date.now().show} </p>
+    <p> ${html.link("http://sigrid.cs.lth.se", "Sigrid")} är en hjälpköwebbapp @ ${Date.now().show} </p>
     <p> Karta över ${html.link("https://fileadmin.cs.lth.se/cs/Bilder/Salar/Datorsalar_E-huset.pdf", "E-husets datorrum")}. Kolla ${html.link("https://github.com/bjornregnell/sigrid/", "koden")}.</p>
   """
 
