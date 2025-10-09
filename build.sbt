@@ -4,6 +4,7 @@ ThisBuild / scalaVersion := "2.13.16"
 
 libraryDependencies += "com.typesafe.akka" %% "akka-http"   % "10.2.10"
 libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.6.20"
+libraryDependencies += "com.typesafe.akka" %% "akka-http-spray-json" % "10.2.10"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
