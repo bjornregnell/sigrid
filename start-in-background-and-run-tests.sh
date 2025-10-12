@@ -1,2 +1,0 @@
-scala run . &
-scala test .

@@ -4,38 +4,62 @@
 
 A help queue web app for lab sessions and tutorials named after the doll [Sigrid](https://www.youtube.com/watch?v=cc-TAuKWdTI) in  "Beppes godnattstund".
 
-## About the 2.x branch
+### About the 2.x branch
 
-This branch is a rewrite of Sigrid from scratch with minimal complexity lean Scala using 
-* Scala >= 3.5.0
+This branch is a rewrite of Sigrid from scratch with minimal complexity lean Scala using
+* Scala 3.3.6 (Current LTS)
 * OpenJDK >= 21
-* [Scala CLI](https://scala-cli.virtuslab.org/) as build tool
-* [cask](https://github.com/com-lihaoyi/cask) instead of akka
-* [storky](https://github.com/bjornregnell/storky) as the in-memory, thread-safe key-value-store
+* [sbt](https://www.scala-sbt.org/) as build tool (multi-project setup)
+* [Scala.js](https://www.scala-js.org/) for client-side development
+* [cask](https://github.com/com-lihaoyi/cask) web framework for the server
+* [Laminar](https://laminar.dev/) for the Scala.js client
 
-# How to use a running Sigrid server
+## Project Structure
 
-TODO
+The project uses an sbt multi-project setup with three core subdirectories:
 
-# How to run Sigrid as a server
+* **`common/`** - Shared code that runs on both JVM (server) and JavaScript (client)
+* **`server/`** - Scala/JVM backend using the cask web framework
+* **`client/`** - Scala.js frontend using Laminar for reactive UI
 
-* You need at least java 21 installed.
+## Development
 
-* Download the latest assembly jar from Releases and start with `java -jar nameofjar.jar` and the server is now running on localhost:????
+To get the development environment running:
 
-# How to build and start Sigrid from code 
+1. **Prerequisites**: You need at least Java 21 installed.
 
-* Clone this repo and checkout the v2.x branch `git checkout v2.x`
+2. **Clone and setup**:
+   ```bash
+   git clone <repo-url>
+   cd sigrid
+   git checkout v2.x
+   ```
 
-* Run with `scala run .`
+3. **Start sbt**:
+   ```bash
+   sbt
+   ```
 
-* Your server is now running at `localhost:8080` open to the world if that port is forwarded in your router.
+4. **Start the development servers**: In the sbt shell, run these commands in sequence:
 
-* Try the basic api
-  * `curl http://localhost:8080/`   -> "hello world"
-  * `curl -d 'k1:v1;key2:value2' http://localhost:8080/add-all`
-  * `curl http://localhost:8080/get-all`
+   First, start the server:
+   ```
+   server/run
+   ```
+   This starts the server at `localhost:8080`. Keep this running.
 
-* Package with `scala --power package . -o sigrid-assembly-2.x.y.jar --assembly`
+   Then, in the same sbt shell, compile the client:
+   ```
+   client/fastLinkJS
+   ```
+   This compiles the Scala.js client code.
 
+5. **View the application**: Open `client/index-dev.html` in your browser to see the development version.
+
+## Examples
+
+* **Test the server API**:
+  * `curl http://localhost:8080/ping` - health check endpoint
+
+* **Development workflow**: Keep `server/run` and `client/fastLinkJS` running, then refresh `index-dev.html` as you make changes.
 
