@@ -1,6 +1,9 @@
+package sigrid.server
+
 import cask.*
 import sigrid.common.Utils
 import storky.Store
+import sigrid.common.model.*
 
 val db: Store[String, String] = Store.empty()
 

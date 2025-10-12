@@ -1,3 +1,5 @@
+package sigrid.client
+
 import com.raquo.laminar.api.L.*
 import org.scalajs.dom
 import sigrid.common.Utils
