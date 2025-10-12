@@ -1,5 +1,8 @@
 import cask.*
 import sigrid.common.Utils
+import storky.Store
+
+val db: Store[String, String] = Store.empty()
 
 object Main extends cask.MainRoutes:
 
@@ -16,3 +19,7 @@ object Main extends cask.MainRoutes:
     )
 
   initialize()
+
+  println("server started at port=" + port)
+  println("debugMode=" + debugMode)
+  println("verbose=" + verbose)
