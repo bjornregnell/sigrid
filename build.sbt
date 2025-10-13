@@ -1,10 +1,13 @@
-ThisBuild / scalaVersion := "3.7.3" // Latest (as of 2025-10-12)
+ThisBuild / scalaVersion := "3.7.3" // Latest as of 2025-10-12
 
 lazy val common = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("common"))
   .settings(
-    name := "common"
+    name := "common",
+    libraryDependencies ++= Seq(
+      "com.lihaoyi" %%% "upickle" % "4.3.2" // Latest as of 2025-10-13
+    )
   )
 
 lazy val commonJvm = common.jvm

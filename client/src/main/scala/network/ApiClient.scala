@@ -6,7 +6,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js.Thenable.Implicits.*
 
 object ApiClient:
-  private val baseUrl = "http://localhost:8080"
+  private val baseUrl = "http://localhost:8080/api"
 
   sealed trait ApiError
   case class NetworkError(message: String) extends ApiError
