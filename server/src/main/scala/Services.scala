@@ -4,9 +4,19 @@ import sigrid.common.model.{Room, User}
 
 object Services:
 
+  /** Retrieves all currently active rooms from the database.
+    * @return Vector of all Room objects
+    */
   def getAllRooms(): Vector[Room] =
     Database.rooms
 
+  /** Logs in a student by creating a user and adding them to a room.
+    * Handles room creation if the room doesn't exist.
+    * @param name Student's first name
+    * @param course Course code
+    * @param roomName Room name
+    * @return Some((User, Room)) on success, None if room operations fail
+    */
   def loginStudent(
       name: String,
       course: String,

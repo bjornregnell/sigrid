@@ -10,10 +10,16 @@ object Database:
   private val userStore = Store.empty[String, Vector[Int]]()
   private val roomStore = Store.empty[RoomKey, Room]()
 
+  /** Gets mapping of user names to their assigned numbers. */
   def userNamesToMap: Map[String, Vector[Int]] = userStore.toMap
+
+  /** Gets mapping of room keys to room objects. */
   def roomsToMap: Map[RoomKey, Room] = roomStore.toMap
+
+  /** Gets all room keys in the database. */
   def roomKeys: Set[RoomKey] = roomsToMap.keySet
 
+  /** Gets all users across all rooms. */
   def users: Set[User] = userNamesToMap
     .map({ case (userName, userIds) =>
       userName -> userIds.map(userId => User(userName, userId))
@@ -22,8 +28,16 @@ object Database:
     .flatten
     .toSet
 
+  /** Gets all active rooms. */
   def rooms: Vector[Room] = roomStore.values.toVector
 
+  /** Creates a new user with auto-incremented number. Handles name validation
+    * and number assignment.
+    * @param name
+    *   Raw user name input
+    * @return
+    *   New User with validated name and unique number
+    */
   def addUser(name: String): User =
     val validName = User.validName(name)
     val updatedUserIds = userStore.update(validName)(existingUserIdsOpt =>
@@ -35,13 +49,16 @@ object Database:
     )
     User(validName, updatedUserIds.map(_.last).getOrElse(1))
 
+  /** Checks if a user exists in the database. */
   def hasUser(user: User): Boolean =
     val userIds = userStore.get(user.name).getOrElse(Vector())
     userIds.contains(user.number)
 
+  /** Checks if a room exists for the given course and name. */
   def hasRoom(course: String, roomName: String): Boolean =
     roomKeys.contains(RoomKey(course, roomName))
 
+  /** Removes a user from the database and all rooms. */
   def removeUser(user: User): Boolean =
     var existed = false
     userStore.update(user.name)(existingUserIdsOpt =>
@@ -54,6 +71,7 @@ object Database:
     )
     existed
 
+  /** Removes a user only if they're not in any room. */
   def removeUserIfNotInAnyRoom(user: User): Boolean =
     var wasRemoved = false
     userStore.update(user.name)(existingUserIdsOpt =>
@@ -69,6 +87,7 @@ object Database:
     )
     wasRemoved
 
+  /** Checks if a user is currently in any room. */
   def isUserInSomeRoom(user: User): Boolean =
     var found = false
     val roomIterator = roomStore.values.iterator
@@ -78,6 +97,7 @@ object Database:
         found = true
     found
 
+  /** Finds the room containing the specified user. */
   def findUserInSomeRoom(user: User): Option[Room] =
     var found = false
     val roomIterator = roomStore.values.iterator
@@ -88,6 +108,7 @@ object Database:
         found = true
     if found then Some(room) else None
 
+  /** Removes all rooms marked as removable. */
   def purgeRemovableRooms()
       : Int = // TODO: investigate if this is thread safe ???
     var removedCount = 0
@@ -103,6 +124,7 @@ object Database:
     )
     removedCount
 
+  /** Removes all users not currently in any room. */
   def purgeRemovableUsers(): Int =
     var removedCount = 0
     users.foreach(user =>
@@ -110,7 +132,7 @@ object Database:
     )
     removedCount
 
-  /** Remove room if existing, returns deleted room or None if non-existing. */
+  /** Removes a room and cleans up orphaned users. */
   def removeRoom(course: String, roomName: String): Option[Room] =
     val roomKey = RoomKey(course, roomName)
     val removedRoom = roomStore.get(roomKey)
@@ -122,6 +144,14 @@ object Database:
     usersToMaybeRemove.foreach(removeUserIfNotInAnyRoom)
     removedRoom
 
+  /** Creates a new room if it doesn't already exist.
+    * @param course
+    *   Course code
+    * @param roomName
+    *   Room name
+    * @return
+    *   Some(Room) if room exists or was created, None if invalid
+    */
   def addRoomIfNotExists(
       course: String,
       roomName: String
@@ -133,9 +163,7 @@ object Database:
       else roomOpt
     )
 
-  /** Merge fromRoomName into toRoomName if both exists and delete fromRoomKey,
-    * returns merged room if it exists, or None if fromRoomName == toRoomName
-    */
+  /** Merges two rooms by combining their students and queues. */
   def mergeRooms(
       course: String,
       fromRoomName: String,
@@ -162,6 +190,16 @@ object Database:
       )
     else None
 
+  /** Adds a student to an existing room.
+    * @param student
+    *   The User to add
+    * @param course
+    *   Course code
+    * @param roomName
+    *   Room name
+    * @return
+    *   Some(updated Room) if room exists, None otherwise
+    */
   def addStudentIfRoomExists(
       student: User,
       course: String,
@@ -171,6 +209,7 @@ object Database:
       roomOpt.map(room => room.copy(students = room.students + student))
     )
 
+  /** Adds a supervisor to an existing room. */
   def addSupervisorIfRoomExists(
       supervisor: User,
       course: String,
@@ -182,6 +221,7 @@ object Database:
       )
     )
 
+  /** Adds a student to the help queue. */
   def wantHelp(
       student: User,
       course: String,
@@ -190,6 +230,7 @@ object Database:
     val roomKey = RoomKey(course, roomName)
     roomStore.update(roomKey)(roomOpt => roomOpt.map(_.wantHelp(student)))
 
+  /** Adds a student to the approval queue. */
   def wantApproval(
       student: User,
       course: String,
@@ -198,26 +239,32 @@ object Database:
     val roomKey = RoomKey(course, roomName)
     roomStore.update(roomKey)(roomOpt => roomOpt.map(_.wantApproval(student)))
 
+  /** Removes a user from all queues (they're now working). */
   def working(user: User, course: String, roomName: String): Option[Room] =
     val roomKey = RoomKey(course, roomName)
     roomStore.update(roomKey)(roomOpt => roomOpt.map(_.working(user)))
 
+  /** Removes a user from all queues and room. */
   def goodbye(user: User, course: String, roomName: String): Option[Room] =
     val roomKey = RoomKey(course, roomName)
     roomStore.update(roomKey)(roomOpt => roomOpt.map(_.goodbye(user)))
 
+  /** Removes the first student from the help queue. */
   def popHelpQueue(course: String, roomName: String): Option[Room] =
     val roomKey = RoomKey(course, roomName)
     roomStore.update(roomKey)(roomOpt => roomOpt.map(_.popHelpQueue()))
 
+  /** Removes the first student from the approval queue. */
   def popApprovalQueue(course: String, roomName: String): Option[Room] =
     val roomKey = RoomKey(course, roomName)
     roomStore.update(roomKey)(roomOpt => roomOpt.map(_.popApprovalQueue()))
 
+  /** Clears all students from the help queue. */
   def clearHelpQueue(course: String, roomName: String): Option[Room] =
     val roomKey = RoomKey(course, roomName)
     roomStore.update(roomKey)(roomOpt => roomOpt.map(_.clearHelpQueue()))
 
+  /** Clears all students from the approval queue. */
   def clearApprovalQueue(course: String, roomName: String): Option[Room] =
     val roomKey = RoomKey(course, roomName)
     roomStore.update(roomKey)(roomOpt => roomOpt.map(_.clearApprovalQueue()))
