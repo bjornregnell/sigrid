@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := "3.3.6" // Current LTS (as of 2025-10-12)
+ThisBuild / scalaVersion := "3.7.3" // Latest (as of 2025-10-12)
 
 lazy val common = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
