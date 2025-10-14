@@ -4,6 +4,9 @@ import org.scalajs.dom
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js.Thenable.Implicits.*
+import scala.util.Try
+import upickle.default.*
+import sigrid.common.Serialization.given
 
 object ApiClient:
   private val baseUrl = "http://localhost:8080/api"
@@ -13,12 +16,17 @@ object ApiClient:
   case class HttpError(status: Int, message: String) extends ApiError
   case class ParseError(message: String) extends ApiError
 
-  def get(endpoint: String): Future[Either[ApiError, String]] =
+  def get[T: ReadWriter](endpoint: String): Future[Either[ApiError, T]] =
     dom
       .fetch(s"$baseUrl$endpoint")
       .toFuture
       .flatMap(response =>
-        if response.ok then response.text().toFuture.map(Right(_))
+        if response.ok then
+          response.text().toFuture.map(jsonString =>
+            Try(read[T](jsonString)).toEither.left.map(ex =>
+              ParseError(s"Failed to parse JSON: ${ex.getMessage}")
+            )
+          )
         else
           response
             .text()
@@ -29,24 +37,27 @@ object ApiClient:
         Left(NetworkError(ex.getMessage))
       })
 
-  def post(
-      endpoint: String,
-      requestBody: String
-  ): Future[Either[ApiError, String]] =
+  def post[T: ReadWriter, U: ReadWriter](endpoint: String, body: T): Future[Either[ApiError, U]] =
     val requestHeaders = new dom.Headers()
     requestHeaders.set("Content-Type", "application/json")
+    val jsonBody = write(body)
 
     val requestInit = new dom.RequestInit {
       method = dom.HttpMethod.POST
       headers = requestHeaders
-      body = requestBody
+      body = jsonBody
     }
 
     dom
       .fetch(s"$baseUrl$endpoint", requestInit)
       .toFuture
       .flatMap(response =>
-        if response.ok then response.text().toFuture.map(Right(_))
+        if response.ok then
+          response.text().toFuture.map(jsonString =>
+            Try(read[U](jsonString)).toEither.left.map(ex =>
+              ParseError(s"Failed to parse JSON: ${ex.getMessage}")
+            )
+          )
         else
           response
             .text()
