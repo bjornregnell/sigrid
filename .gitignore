@@ -8,3 +8,5 @@
 .bsp
 .vscode
 .scala-build
+node_modules
+dist
