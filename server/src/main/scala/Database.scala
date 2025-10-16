@@ -2,9 +2,7 @@ package sigrid.server
 
 import scala.util.Try
 import storky.Store
-import sigrid.common.model.RoomKey
-import sigrid.common.model.Room
-import sigrid.common.model.User
+import sigrid.common.model.{RoomKey, Room, User, Role}
 
 object Database:
   private val userStore = Store.empty[String, Vector[Int]]()
@@ -20,13 +18,9 @@ object Database:
   def roomKeys: Set[RoomKey] = roomsToMap.keySet
 
   /** Gets all users across all rooms. */
-  def users: Set[User] = userNamesToMap
-    .map({ case (userName, userIds) =>
-      userName -> userIds.map(userId => User(userName, userId))
-    })
-    .values
-    .flatten
-    .toSet
+  def users: Set[User] =
+    // Collect users from actual rooms since we need their role
+    rooms.flatMap(room => room.students ++ room.supervisors).toSet
 
   /** Gets all active rooms. */
   def rooms: Vector[Room] = roomStore.values.toVector
@@ -35,10 +29,12 @@ object Database:
     * and number assignment.
     * @param name
     *   Raw user name input
+    * @param role
+    *   User role (Student or Supervisor)
     * @return
-    *   New User with validated name and unique number
+    *   New User with validated name, unique number, and role
     */
-  def addUser(name: String): User =
+  def addUser(name: String, role: Role): User =
     val validName = User.validName(name)
     val updatedUserIds = userStore.update(validName)(existingUserIdsOpt =>
       if existingUserIdsOpt.isEmpty then Some(Vector(1))
@@ -47,7 +43,7 @@ object Database:
           existingUserIds :+ (Try(existingUserIds.max).getOrElse(0) + 1)
         )
     )
-    User(validName, updatedUserIds.map(_.last).getOrElse(1))
+    User(validName, updatedUserIds.map(_.last).getOrElse(1), role)
 
   /** Checks if a user exists in the database. */
   def hasUser(user: User): Boolean =

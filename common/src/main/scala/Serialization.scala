@@ -18,7 +18,18 @@ object Serialization:
     }
   )
 
+  // Custom serializer for Role enum (serialize as string)
+  given ReadWriter[Role] = readwriter[String].bimap[Role](
+    role => role.toString.toLowerCase,
+    str =>
+      str.toLowerCase match
+        case "student"    => Role.Student
+        case "supervisor" => Role.Supervisor
+        case _ => throw new IllegalArgumentException(s"Invalid role: $str")
+  )
+
   // Auto-derive serializers for case classes
+  // User needs to be after Role since it depends on it
   given ReadWriter[User] = macroRW
   given ReadWriter[RoomKey] = macroRW
   given ReadWriter[Room] = macroRW

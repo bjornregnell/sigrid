@@ -2,10 +2,13 @@ package sigrid.common.model
 
 import scala.util.Try
 
-case class User(name: String, number: Int):
+enum Role:
+  case Student, Supervisor
+
+case class User(name: String, number: Int, role: Role):
   require(name == User.validName(name), s"invalid user name: $name")
   require(number > 0, s"invalid user number: $number")
-  val id = s"$name-$number"
+  val id = s"$name-$number-${role.toString.toLowerCase}"
   override def toString = id
 
 object User:
@@ -21,6 +24,10 @@ object User:
 
   def fromUserId(uid: String): Option[User] = Try({
     val xs = validUserId(uid).split('-')
-    assert(xs.length == 2)
-    User(validName(xs(0)), xs(1).toInt)
+    assert(xs.length == 3)
+    val role = xs(2) match
+      case "student"    => Role.Student
+      case "supervisor" => Role.Supervisor
+      case _ => throw new IllegalArgumentException(s"Invalid role: ${xs(2)}")
+    User(validName(xs(0)), xs(1).toInt, role)
   }).toOption
