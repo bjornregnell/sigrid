@@ -4,7 +4,7 @@ import com.raquo.laminar.api.L.*
 import sigrid.client.network.ApiClient
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object Student:
+object Sigrid:
 
   def apply(): HtmlElement =
     mainTag(

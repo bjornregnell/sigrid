@@ -34,8 +34,8 @@ object Router:
 
   val splitter =
     SplitRender[Page, HtmlElement](RouterInstance.currentPageSignal)
-      .collectStatic(StudentPage)(views.Student())
-      .collectStatic(SupervisorPage)(views.Supervisor())
+      .collectStatic(StudentPage)(views.Sigrid())
+      .collectStatic(SupervisorPage)(views.Beppe())
       .collect[NotFoundPage]({ case page =>
         views.NotFound(RouterInstance, page.path)
       })
