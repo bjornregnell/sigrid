@@ -1,9 +1,9 @@
-package sigrid.client.ui
+package sigrid.client.views
 
 import com.raquo.laminar.api.L.*
 
-object SupervisorPage:
+object Supervisor:
   def apply(): HtmlElement =
     mainTag(
-      "Supervisor view"
+      "beppe"
     )

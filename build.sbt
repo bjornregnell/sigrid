@@ -20,6 +20,7 @@ lazy val client = (project in file("client"))
     name := "client",
     libraryDependencies ++= Seq(
       "com.raquo" %%% "laminar" % "17.2.1", // Latest as of 2025-10-12
+      "com.raquo" %%% "waypoint" % "9.0.0", // Latest as of 2025-10-15
       "io.github.cquiroz" %%% "scala-java-time" % "2.6.0" // java.time Scala.js compatability
     ),
     scalaJSUseMainModuleInitializer := true

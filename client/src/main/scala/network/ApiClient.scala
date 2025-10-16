@@ -37,33 +37,3 @@ object ApiClient:
         Left(NetworkError(ex.getMessage))
       })
 
-  def post[T: ReadWriter, U: ReadWriter](endpoint: String, body: T): Future[Either[ApiError, U]] =
-    val requestHeaders = new dom.Headers()
-    requestHeaders.set("Content-Type", "application/json")
-    val jsonBody = write(body)
-
-    val requestInit = new dom.RequestInit {
-      method = dom.HttpMethod.POST
-      headers = requestHeaders
-      body = jsonBody
-    }
-
-    dom
-      .fetch(s"$baseUrl$endpoint", requestInit)
-      .toFuture
-      .flatMap(response =>
-        if response.ok then
-          response.text().toFuture.map(jsonString =>
-            Try(read[U](jsonString)).toEither.left.map(ex =>
-              ParseError(s"Failed to parse JSON: ${ex.getMessage}")
-            )
-          )
-        else
-          response
-            .text()
-            .toFuture
-            .map(errorText => Left(HttpError(response.status, errorText)))
-      )
-      .recover({ case ex =>
-        Left(NetworkError(ex.getMessage))
-      })
