@@ -1,21 +1,29 @@
 package sigrid.common.model
 
-import java.time.Duration
-
 object Room:
   val HoursUntilExpired = 10
+  val MillisPerHour = 60L * 60L * 1000L
 
-  def timeWaited(element: (User, Date)): Duration =
-    Duration.between(element._2.dateTime, Date.now().dateTime)
+  /** Returns current time as Unix timestamp (milliseconds since epoch) */
+  def now(): Timestamp = System.currentTimeMillis()
 
-  def queueToStringWithTimer(vector: Vector[(User, Date)]): String =
+  /** Calculates time waited in milliseconds */
+  def timeWaitedMillis(element: (User, Timestamp)): Long =
+    now() - element._2
+
+  /** Calculates time waited in minutes */
+  def timeWaitedMinutes(element: (User, Timestamp)): Long =
+    timeWaitedMillis(element) / (60L * 1000L)
+
+  def queueToStringWithTimer(vector: Vector[(User, Timestamp)]): String =
     def showDurationWaited(
-        element: (User, Date),
+        element: (User, Timestamp),
         keepOneDecimal: Boolean = false
     ): String =
+      val minutes = timeWaitedMinutes(element)
       if keepOneDecimal then
-        f"${(timeWaited(element).toSeconds() / 60.0)}%.1f" // Keeping it here if we want to switch to keeping one decimal.
-      else Math.round(timeWaited(element).toSeconds() / 60.0).toString()
+        f"${minutes.toDouble}%.1f"
+      else minutes.toString
 
     if vector.size >= 1 then
       val t = showDurationWaited(vector.head)
@@ -31,14 +39,14 @@ case class Room(
     name: String,
     supervisors: Set[User] = Set(),
     students: Set[User] = Set(),
-    helpQueue: Vector[(User, Date)] = Vector(),
-    approvalQueue: Vector[(User, Date)] = Vector(),
-    created: Date = Date.now()
+    helpQueue: Vector[(User, Timestamp)] = Vector(),
+    approvalQueue: Vector[(User, Timestamp)] = Vector(),
+    created: Timestamp = Room.now()
 ):
   def wantHelp(u: User): Room = copy(
     helpQueue =
       if (helpQueue.exists(_._1 == u)) helpQueue
-      else helpQueue :+ (u, Date.now()),
+      else helpQueue :+ (u, Room.now()),
     approvalQueue = approvalQueue.filterNot(_._1 == u)
   )
 
@@ -46,7 +54,7 @@ case class Room(
     helpQueue = helpQueue.filterNot(_._1 == u),
     approvalQueue =
       if (approvalQueue.exists(_._1 == u)) approvalQueue
-      else approvalQueue :+ (u, Date.now())
+      else approvalQueue :+ (u, Room.now())
   )
 
   def working(u: User): Room = copy(
@@ -68,10 +76,10 @@ case class Room(
   def maxQueuingTime(): Int =
     // Returns the maximum queuing time of both queues as an integer of minutes.
     val queueingTimes = (
-      if (helpQueue.size >= 1) Room.timeWaited(helpQueue.head).toMinutes().toInt
+      if (helpQueue.size >= 1) Room.timeWaitedMinutes(helpQueue.head).toInt
       else 0,
       if (approvalQueue.size >= 1)
-        Room.timeWaited(approvalQueue.head).toMinutes().toInt
+        Room.timeWaitedMinutes(approvalQueue.head).toInt
       else 0
     )
     Math.max(
@@ -88,13 +96,14 @@ case class Room(
   def popApprovalQueue(): Room = copy(approvalQueue = approvalQueue.drop(1))
 
   def isExpired: Boolean =
-    created < Date.now().minusHours(Room.HoursUntilExpired)
+    val expiryTime = created + (Room.HoursUntilExpired * Room.MillisPerHour)
+    Room.now() > expiryTime
 
   def isActive: Boolean = supervisors.nonEmpty || students.nonEmpty
 
   def isRemovable: Boolean = !isActive || isExpired
 
-  def longestWaitingTimeMinutes: Int = ???
+  def longestWaitingTimeMinutes: Int = maxQueuingTime()
 
   override def toString =
     s"Room($course, $name, supervisor=$supervisors, students=$students), helpQueue=$helpQueue, approvalQueue=$approvalQueue, created=${created})"
