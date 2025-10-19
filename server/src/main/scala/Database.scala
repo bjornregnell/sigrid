@@ -20,7 +20,7 @@ object Database:
   /** Gets all users across all rooms. */
   def users: Set[User] =
     // Collect users from actual rooms since we need their role
-    rooms.flatMap(room => room.students ++ room.supervisors).toSet
+    rooms.flatMap(room => room.users).toSet
 
   /** Gets all active rooms. */
   def rooms: Vector[Room] = roomStore.values.toVector
@@ -89,7 +89,7 @@ object Database:
     val roomIterator = roomStore.values.iterator
     while !found && roomIterator.hasNext do
       val room = roomIterator.next()
-      if room.students.contains(user) || room.supervisors.contains(user) then
+      if room.users.contains(user) then
         found = true
     found
 
@@ -100,7 +100,7 @@ object Database:
     var room: Room = null
     while !found && roomIterator.hasNext do
       room = roomIterator.next()
-      if room.students.contains(user) || room.supervisors.contains(user) then
+      if room.users.contains(user) then
         found = true
     if found then Some(room) else None
 
@@ -134,7 +134,7 @@ object Database:
     val removedRoom = roomStore.get(roomKey)
     val usersToMaybeRemove = scala.collection.mutable.ListBuffer.empty[User]
     roomStore.update(roomKey)(roomOpt =>
-      roomOpt.foreach(_.students.foreach(user => usersToMaybeRemove += user))
+      roomOpt.foreach(_.users.foreach(user => usersToMaybeRemove += user))
       None
     )
     usersToMaybeRemove.foreach(removeUserIfNotInAnyRoom)
@@ -159,7 +159,7 @@ object Database:
       else roomOpt
     )
 
-  /** Merges two rooms by combining their students and queues. */
+  /** Merges two rooms by combining their users and queues. */
   def mergeRooms(
       course: String,
       fromRoomName: String,
@@ -174,7 +174,7 @@ object Database:
           if fromRoomOpt.isDefined then
             val sourceRoom = fromRoomOpt.get
             val updatedRoom = targetRoom.copy(
-              students = targetRoom.students ++ sourceRoom.students,
+              users = targetRoom.users ++ sourceRoom.users,
               helpQueue = targetRoom.helpQueue ++ sourceRoom.helpQueue,
               approvalQueue =
                 targetRoom.approvalQueue ++ sourceRoom.approvalQueue
@@ -186,9 +186,9 @@ object Database:
       )
     else None
 
-  /** Adds a student to an existing room.
-    * @param student
-    *   The User to add
+  /** Adds a user to an existing room.
+    * @param user
+    *   The User to add (can be student or supervisor)
     * @param course
     *   Course code
     * @param roomName
@@ -196,25 +196,13 @@ object Database:
     * @return
     *   Some(updated Room) if room exists, None otherwise
     */
-  def addStudentIfRoomExists(
-      student: User,
+  def addUserIfRoomExists(
+      user: User,
       course: String,
       roomName: String
   ): Option[Room] =
     roomStore.update(RoomKey(course, roomName))(roomOpt =>
-      roomOpt.map(room => room.copy(students = room.students + student))
-    )
-
-  /** Adds a supervisor to an existing room. */
-  def addSupervisorIfRoomExists(
-      supervisor: User,
-      course: String,
-      roomName: String
-  ): Option[Room] =
-    roomStore.update(RoomKey(course, roomName))(roomOpt =>
-      roomOpt.map(room =>
-        room.copy(supervisors = room.supervisors + supervisor)
-      )
+      roomOpt.map(room => room.copy(users = room.users + user))
     )
 
   /** Adds a student to the help queue. */

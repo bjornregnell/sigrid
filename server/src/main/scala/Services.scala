@@ -40,10 +40,6 @@ object Services:
     val user = Database.addUser(name, role)
     Database.addRoomIfNotExists(course, roomName)
 
-    val roomOpt = role match
-      case Role.Student =>
-        Database.addStudentIfRoomExists(user, course, roomName)
-      case Role.Supervisor =>
-        Database.addSupervisorIfRoomExists(user, course, roomName)
+    val roomOpt = Database.addUserIfRoomExists(user, course, roomName)
 
     roomOpt.map(room => (user, room))

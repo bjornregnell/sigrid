@@ -21,8 +21,7 @@ object Room:
         keepOneDecimal: Boolean = false
     ): String =
       val minutes = timeWaitedMinutes(element)
-      if keepOneDecimal then
-        f"${minutes.toDouble}%.1f"
+      if keepOneDecimal then f"${minutes.toDouble}%.1f"
       else minutes.toString
 
     if vector.size >= 1 then
@@ -37,12 +36,14 @@ object Room:
 case class Room(
     course: String,
     name: String,
-    supervisors: Set[User] = Set(),
-    students: Set[User] = Set(),
+    users: Set[User] = Set(),
     helpQueue: Vector[(User, Timestamp)] = Vector(),
     approvalQueue: Vector[(User, Timestamp)] = Vector(),
     created: Timestamp = Room.now()
 ):
+  def students: Set[User] = users.filter(_.role == Role.Student)
+  def supervisors: Set[User] = users.filter(_.role == Role.Supervisor)
+
   def wantHelp(u: User): Room = copy(
     helpQueue =
       if (helpQueue.exists(_._1 == u)) helpQueue
@@ -58,16 +59,14 @@ case class Room(
   )
 
   def working(u: User): Room = copy(
-    students = students + u,
     helpQueue = helpQueue.filterNot(_._1 == u),
     approvalQueue = approvalQueue.filterNot(_._1 == u)
   )
 
   def goodbye(u: User): Room = copy(
-    students = students - u,
+    users = users - u,
     helpQueue = helpQueue.filterNot(_._1 == u),
-    approvalQueue = approvalQueue.filterNot(_._1 == u),
-    supervisors = supervisors - u
+    approvalQueue = approvalQueue.filterNot(_._1 == u)
   )
 
   def helpQueueString(): String = Room.queueToStringWithTimer(helpQueue)
@@ -99,11 +98,11 @@ case class Room(
     val expiryTime = created + (Room.HoursUntilExpired * Room.MillisPerHour)
     Room.now() > expiryTime
 
-  def isActive: Boolean = supervisors.nonEmpty || students.nonEmpty
+  def isActive: Boolean = users.nonEmpty
 
   def isRemovable: Boolean = !isActive || isExpired
 
   def longestWaitingTimeMinutes: Int = maxQueuingTime()
 
   override def toString =
-    s"Room($course, $name, supervisor=$supervisors, students=$students), helpQueue=$helpQueue, approvalQueue=$approvalQueue, created=${created})"
+    s"Room($course, $name, supervisors=$supervisors, students=$students, helpQueue=$helpQueue, approvalQueue=$approvalQueue, created=${created})"
