@@ -10,8 +10,3 @@
     justify-content: space-between;
     align-items: center;
 }
-
-.queue-items .wait-time {
-    color: gray;
-    font-size: 1.2rem;
-}

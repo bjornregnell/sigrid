@@ -6,6 +6,7 @@
     font-optical-sizing: auto;
     font-style: normal;
     text-decoration: unset;
+    color: var(--color-text);
 }
 
 h1,
@@ -32,4 +33,9 @@ h4,
 h5,
 h6 {
     font-style: italic;
+}
+
+small {
+    font-size: 1.2rem;
+    color: var(--color-text-secondary);
 }

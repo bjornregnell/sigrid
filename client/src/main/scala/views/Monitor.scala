@@ -71,17 +71,18 @@ object Monitor:
         "in-approval-queue"
       else "working"
 
-    def studentWaitTime(student: User): Long =
-      room.helpQueue.find(_._1 == student)
+    def studentWaitTime(student: User): Option[Long] =
+      room.helpQueue
+        .find(_._1 == student)
         .orElse(room.approvalQueue.find(_._1 == student))
         .map(entry => Room.timeWaitedMinutes(entry))
-        .getOrElse(0)
 
-    val sortedStudents = room.students.toSeq.sortBy { student =>
-      val waitTime = studentWaitTime(student)
-      if waitTime > 0 then -waitTime // Negative to put longest wait first
-      else 1000 // Working students last
-    }
+    val sortedStudents = room.students.toSeq.sortBy(student =>
+      studentWaitTime(student) match
+        case Some(waitTime) =>
+          (0, -waitTime)
+        case None => (1, 0L)
+    )
 
     articleTag(
       className := "room",

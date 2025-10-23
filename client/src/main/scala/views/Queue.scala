@@ -10,8 +10,7 @@ object Queue:
       queue.zipWithIndex.map { case ((user, timestamp), idx) =>
         div(
           span(s"${idx + 1}. ${user.name.capitalize}"),
-          span(
-            className := "wait-time",
+          small(
             s"${Room.timeWaitedMinutes((user, timestamp))} min"
           )
         )
