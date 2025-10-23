@@ -1,0 +1,12 @@
+.svg-icon {
+    display: flex;
+    width: 1em;
+    height: 1em;
+    background-color: currentColor;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+}

@@ -1,0 +1,17 @@
+.queue-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.queue-items>div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.queue-items .wait-time {
+    color: gray;
+    font-size: 1.2rem;
+}

@@ -8,6 +8,11 @@ object Database:
   private val userStore = Store.empty[String, Vector[Int]]()
   private val roomStore = Store.empty[RoomKey, Room]()
 
+  MockData.userNames.foreach((name, numbers) =>
+    userStore.update(name)(_ => Some(numbers))
+  )
+  MockData.rooms.foreach((key, room) => roomStore.update(key)(_ => Some(room)))
+
   /** Gets mapping of user names to their assigned numbers. */
   def userNamesToMap: Map[String, Vector[Int]] = userStore.toMap
 
@@ -89,8 +94,7 @@ object Database:
     val roomIterator = roomStore.values.iterator
     while !found && roomIterator.hasNext do
       val room = roomIterator.next()
-      if room.users.contains(user) then
-        found = true
+      if room.users.contains(user) then found = true
     found
 
   /** Finds the room containing the specified user. */
@@ -100,8 +104,7 @@ object Database:
     var room: Room = null
     while !found && roomIterator.hasNext do
       room = roomIterator.next()
-      if room.users.contains(user) then
-        found = true
+      if room.users.contains(user) then found = true
     if found then Some(room) else None
 
   /** Removes all rooms marked as removable. */

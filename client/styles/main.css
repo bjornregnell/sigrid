@@ -1,0 +1,23 @@
+* {
+    /*
+        By setting the box-sizing property to border-box, the browser will take border thickness
+        and padding into account when calculating the size of an element, which makes it A LOT
+        easier to manage element sizes.
+        https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
+    */
+    box-sizing: border-box;
+}
+
+html {
+    /* 
+        By setting a document base font size, we can use relative units (REM) in all other cases.
+        Then, if we want to change font sizes based on screen dimensions, we only need to update
+        the base font size, and all elements will be updated accordingly.
+        https://www.sitepoint.com/understanding-and-using-rem-units-in-css/
+    */
+    font-size: 10px;
+}
+
+body {
+    margin: unset;
+}
