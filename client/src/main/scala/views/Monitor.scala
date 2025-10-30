@@ -8,9 +8,32 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import sigrid.common.model.User
 
 object Monitor:
+  private val roomCategories: List[(String, Set[String])] = List(
+    ("Grekiska", Set("Alfa", "Beta", "Gamma")),
+    (
+      "Källaren S",
+      Set(
+        "Elg",
+        "Falk",
+        "Hacke",
+        "Lo",
+        "Panter",
+        "Val",
+        "Varg",
+        "Elgkalv",
+        "Ravel"
+      )
+    ),
+    (
+      "Källaren N",
+      Set("Jupiter", "Mars", "Saturnus", "Venus", "Neptunus", "Pluto", "Uranus")
+    )
+  )
+
   def apply(): HtmlElement =
     val roomsVar = Var[Vector[Room]](Vector.empty)
     val errorVar = Var[Option[String]](None)
+    val expandedCategoriesVar = Var[Map[String, Boolean]](Map.empty)
 
     def fetchRooms(): Unit =
       ApiClient
@@ -34,25 +57,53 @@ object Monitor:
       p(
         "Sigrid Monitor visar köer för resurs- och labbtider lajv!"
       ),
-      // Error display
+      // TODO: Error display
       // child <-- errorVar.signal.map({
       //   case Some(error) =>
       //     div(cls := "error-message", error)
       //   case None => emptyNode
       // }),
-      mainTag(
-        className := "rooms",
-        child <-- roomsVar.signal
-          .combineWith(errorVar.signal)
-          .map({
-            case (rooms, error) if rooms.isEmpty && error.isEmpty =>
-              div(
-                className := "no-rooms-message",
-                "Inga aktiva rum för tillfället."
+      child <-- roomsVar.signal
+        .combineWith(errorVar.signal)
+        .map({
+          case (rooms, error) if rooms.isEmpty && error.isEmpty =>
+            div(
+              className := "no-rooms-message",
+              "Inga aktiva rum för tillfället."
+            )
+          case _ => emptyNode
+        }),
+      children <-- roomsVar.signal.map(rooms =>
+        val categorizedElements =
+          roomCategories.flatMap((categoryName, roomNames) =>
+            val matchingRooms =
+              rooms.filter(room => roomNames.contains(room.name))
+            if (matchingRooms.nonEmpty)
+              Some(
+                renderRoomCategory(
+                  categoryName,
+                  matchingRooms,
+                  expandedCategoriesVar
+                )
               )
-            case _ => emptyNode
-          }),
-        children <-- roomsVar.signal.map(_.sortBy(_.name).map(renderRoom))
+            else None
+          )
+
+        val allCategorizedRoomNames = roomCategories.flatMap(_._2).toSet
+        val uncategorizedRooms =
+          rooms.filterNot(room => allCategorizedRoomNames.contains(room.name))
+
+        val otherElement = if (uncategorizedRooms.nonEmpty) {
+          List(
+            renderRoomCategory(
+              "Övrigt",
+              uncategorizedRooms,
+              expandedCategoriesVar
+            )
+          )
+        } else List.empty
+
+        categorizedElements ++ otherElement
       ),
       onMountCallback { _ =>
         val intervalId = org.scalajs.dom.window.setInterval(
@@ -62,6 +113,41 @@ object Monitor:
         // Return cleanup function
         () => { org.scalajs.dom.window.clearInterval(intervalId) }
       }
+    )
+
+  private def renderRoomCategory(
+      title: String,
+      rooms: Seq[Room],
+      expandedCategoriesVar: Var[Map[String, Boolean]]
+  ): HtmlElement =
+    val isExpandedSignal =
+      expandedCategoriesVar.signal.map(_.getOrElse(title, true))
+
+    sectionTag(
+      className := "room-category",
+      button(
+        className := "category-header",
+        child <-- isExpandedSignal.map(expanded =>
+          SvgIcon(
+            if expanded then "/icons/expanded.svg"
+            else "/icons/expandable.svg"
+          )
+        ),
+        h2(title),
+        onClick --> { _ =>
+          expandedCategoriesVar.update(map =>
+            map.updated(title, !map.getOrElse(title, true))
+          )
+        }
+      ),
+      child <-- isExpandedSignal.map(expanded =>
+        if expanded then
+          div(
+            className := "rooms",
+            rooms.sortBy(_.name).map(renderRoom)
+          )
+        else emptyNode
+      )
     )
 
   private def renderRoom(room: Room): HtmlElement =
