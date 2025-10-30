@@ -6,7 +6,12 @@
     font-optical-sizing: auto;
     font-style: normal;
     text-decoration: unset;
-    color: var(--color-text);
+    color: inherit;
+    border: unset;
+    border-radius: unset;
+    outline: unset;
+    padding: unset;
+    margin: unset;
 }
 
 h1,
@@ -38,4 +43,14 @@ h6 {
 small {
     font-size: 1.2rem;
     color: var(--color-text-secondary);
+}
+
+button,
+a {
+    cursor: pointer;
+    user-select: none;
+}
+
+button:hover {
+    background-color: unset;
 }

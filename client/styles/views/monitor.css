@@ -6,7 +6,77 @@
 
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 20px;
+}
+
+.monitor .monitor-header {
+    width: 100%;
+    max-width: 1600px;
+    padding: 0 2rem;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+}
+
+.monitor .monitor-header .header-left,
+.monitor .monitor-header .header-center,
+.monitor .monitor-header .header-right {
+    flex: 1;
+    display: flex;
+}
+
+.monitor .monitor-header .header-left {
+    justify-content: flex-start;
+}
+
+.monitor .monitor-header .header-center {
+    justify-content: center;
+    text-align: center;
+}
+
+.monitor .monitor-header .header-right {
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.monitor .monitor-header .header-right a {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-secondary);
+    transition: color 0.15s ease;
+}
+
+.monitor .monitor-header .header-right a:hover {
+    color: var(--color-text);
+}
+
+
+.monitor .monitor-header .compact-view-toggle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-secondary);
+    transition: color 0.15s ease;
+}
+
+.monitor .monitor-header .compact-view-toggle:hover {
+    color: var(--color-text);
+}
+
+.monitor .categories-container {
+    width: 100%;
+    max-width: 1600px;
+    padding: 0 2rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
 .monitor .room-category {
@@ -20,11 +90,9 @@
     flex-direction: row;
     align-items: center;
     gap: 0.75rem;
-
     background: none;
     border: none;
     padding: 0;
-    cursor: pointer;
     text-align: left;
 }
 
@@ -34,9 +102,15 @@
 
 .monitor .rooms {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 1rem;
     width: 100%;
+}
+
+@media (max-width: 768px) {
+    .monitor .rooms {
+        grid-template-columns: 1fr;
+    }
 }
 
 .monitor .no-rooms-message {
@@ -53,6 +127,22 @@
     border-radius: 4px;
     border: 1px solid var(--color-border);
     background-color: var(--color-bg-secondary);
+}
+
+.monitor .room header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.monitor .room .supervisors {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.4rem;
 }
 
 .monitor .room .student-load {
@@ -77,13 +167,6 @@
 
 .monitor .room .student-box.in-approval-queue {
     background: #4ecdc4;
-}
-
-.monitor .room .supervisors {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
 }
 
 .monitor .room .queues {

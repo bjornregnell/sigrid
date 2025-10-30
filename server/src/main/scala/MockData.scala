@@ -42,6 +42,12 @@ object MockData:
   val urban = User("urban", 1, Role.Student)
   val vera = User("vera", 1, Role.Student)
   val wilhelm = User("wilhelm", 1, Role.Student)
+  val xander = User("xander", 1, Role.Student)
+  val yvonne = User("yvonne", 1, Role.Student)
+  val zara = User("zara", 1, Role.Student)
+  val adam = User("adam", 1, Role.Student)
+  val beatrice = User("beatrice", 1, Role.Student)
+  val cecil = User("cecil", 1, Role.Student)
 
   // Room Alfa: High load, 2 supervisors, 10 students, 3 in help queue, 2 in approval queue
   val roomAlfa = Room(
@@ -97,11 +103,49 @@ object MockData:
     created = now
   )
 
+  // Room Beta: Light load, 1 supervisor, 3 students, 1 in help queue
+  val roomBeta = Room(
+    course = "PGK",
+    name = "Beta",
+    users = Set(helena, xander, yvonne, zara),
+    helpQueue = Vector(
+      (xander, threeMinutesAgo)
+    ),
+    approvalQueue = Vector.empty,
+    created = now
+  )
+
+  // Room Jupiter: Medium load, 1 supervisor, 4 students, 2 in approval queue
+  val roomJupiter = Room(
+    course = "PGK",
+    name = "Jupiter",
+    users = Set(ingrid, adam, beatrice, cecil, quinn),
+    helpQueue = Vector.empty,
+    approvalQueue = Vector(
+      (adam, fiveMinutesAgo),
+      (beatrice, twoMinutesAgo)
+    ),
+    created = now
+  )
+
+  // Room E:2313: Low load, no supervisor, 2 students, no queues (uncategorized room)
+  val roomE2313 = Room(
+    course = "PGK",
+    name = "E:2313",
+    users = Set(oliver, martin),
+    helpQueue = Vector.empty,
+    approvalQueue = Vector.empty,
+    created = now
+  )
+
   val rooms: Map[RoomKey, Room] = Map(
     RoomKey("PGK", "Alfa") -> roomAlfa,
     RoomKey("PGK", "Hacke") -> roomHacke,
     RoomKey("PGK", "Gamma") -> roomGamma,
-    RoomKey("PGK", "Elgkalv") -> roomElgkalv
+    RoomKey("PGK", "Elgkalv") -> roomElgkalv,
+    RoomKey("PGK", "Beta") -> roomBeta,
+    RoomKey("PGK", "Jupiter") -> roomJupiter,
+    RoomKey("PGK", "E:2313") -> roomE2313
   )
 
   val userNames: Map[String, Vector[Int]] = Map(
@@ -131,5 +175,11 @@ object MockData:
     "tina" -> Vector(1),
     "urban" -> Vector(1),
     "vera" -> Vector(1),
-    "wilhelm" -> Vector(1)
+    "wilhelm" -> Vector(1),
+    "xander" -> Vector(1),
+    "yvonne" -> Vector(1),
+    "zara" -> Vector(1),
+    "adam" -> Vector(1),
+    "beatrice" -> Vector(1),
+    "cecil" -> Vector(1)
   )

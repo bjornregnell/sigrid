@@ -9,7 +9,7 @@
 }
 
 html {
-    /* 
+    /*
         By setting a document base font size, we can use relative units (REM) in all other cases.
         Then, if we want to change font sizes based on screen dimensions, we only need to update
         the base font size, and all elements will be updated accordingly.
@@ -18,6 +18,19 @@ html {
     font-size: 10px;
 }
 
+/* Reduce base font size on smaller screens to fit more content */
+@media (max-width: 768px) {
+    html {
+        font-size: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    html {
+        font-size: 7px;
+    }
+}
+
 body {
-    margin: unset;
+    color: var(--color-text);
 }
