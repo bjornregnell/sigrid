@@ -37,7 +37,7 @@ object RoomKey {
     "Pluto Neptunus Uranus Saturnus Jupiter Mars Venus Elg Elgkalv Hacke Panter Ravel Val Falk Varg Lo Alfa Beta Gamma Idét Distans".split(" ").toSet
 
   val fromCourseCodeToCourseName = // THIS IS A HACK, same thing different name, see https://kurser.lth.se/lot/course-syllabus/23_24/EITA65
-    Map("EDAA45" -> "PGK", "EDAA60" -> "DOD", "EITA65" -> "DOD") 
+    Map("PROG" -> "PGK", "DOD" -> "PGK", "EDAB05" -> "PGK", "EDAA45" -> "PGK", "EDAA60" -> "PGK") 
 
   def roomWarning(room: String): String = 
     if (RoomKey.knownRooms.contains(room)) "" else  
